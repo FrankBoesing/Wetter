@@ -151,8 +151,8 @@
     .detail-head svg { width:15px; height:15px; color:var(--blue); }
     .detail-value { font-size:20px; font-weight:680; letter-spacing:-.03em; margin-top:11px; }
     .detail-foot { font-size:10px; color:#8199b4; margin-top:4px; line-height:1.4; }
-    .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-    .sun-panel,.air-panel { padding:21px; }
+    .bottom-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; }
+    .sun-panel,.moon-panel,.air-panel { padding:21px; min-width:0; }
     .sun-visual { position:relative; height:117px; margin:15px 5px 0; overflow:hidden; }
     .sun-track { position:absolute; height:90px; left:4%; right:4%; bottom:-47px; border:1px dashed rgba(145,183,217,.35); border-bottom:0; border-radius:170px 170px 0 0; }
     .sun-arc { position:absolute; left:4%; right:4%; bottom:-47px; height:90px; border-top:2px solid transparent; border-radius:170px 170px 0 0; background:linear-gradient(90deg,rgba(105,221,237,.05),rgba(255,189,117,.12),rgba(168,139,255,.06)); clip-path:inset(0 0 46px 0); }
@@ -161,6 +161,19 @@
     .sun-times strong { display:block; color:#eff6ff; font-size:17px; margin-top:5px; }
     .sun-times div:last-child { text-align:right; }
     .sun-length { text-align:center; color:#8ea4bd; font-size:11px; margin-top:13px; }
+    .moon-visual { position:relative; height:117px; margin:15px 5px 0; overflow:hidden; }
+    .moon-track { border-color:rgba(168,139,255,.30); }
+    .moon-arc { background:linear-gradient(90deg,rgba(117,170,255,.045),rgba(168,139,255,.14),rgba(105,221,237,.05)); }
+    .moon-now { position:absolute; width:36px; height:36px; left:var(--moon-x,50%); bottom:calc(10px + var(--moon-y,40px)); transform:translate(-50%,50%); z-index:2; filter:drop-shadow(0 0 10px rgba(185,190,255,.28)); transition:left .35s,bottom .35s,opacity .2s; }
+    .moon-now.below-horizon { opacity:.48; filter:grayscale(.35) drop-shadow(0 0 7px rgba(185,190,255,.15)); }
+    .moon-now svg { display:block; width:100%; height:100%; overflow:visible; }
+    .moon-disc-shadow { fill:#52647c; stroke:rgba(221,231,245,.28); stroke-width:1.1; }
+    .moon-disc-light { fill:#e8edf7; stroke:rgba(255,255,255,.55); stroke-width:.45; }
+    .moon-phase-info { text-align:center; margin-top:13px; }
+    .moon-phase-name { color:#edf5ff; font-size:14px; font-weight:700; letter-spacing:-.01em; }
+    .moon-phase-meta { display:flex; justify-content:center; flex-wrap:wrap; gap:7px; color:#a8bad0; font-size:10px; margin-top:5px; }
+    .moon-phase-meta span+span::before { content:'·'; color:#7189a6; margin-right:7px; }
+    .moon-status { color:#8199b4; font-size:10px; line-height:1.4; margin-top:8px; min-height:14px; }
     .air-head { display:flex; justify-content:space-between; gap:15px; align-items:center; }
     .aqi-number { font-size:31px; font-weight:740; letter-spacing:-.06em; }
     .aqi-label { color:var(--green); font-size:12px; margin-top:1px; }
@@ -208,7 +221,13 @@
     .loading { opacity:.55; }
     .skeleton { display:inline-block; color:transparent!important; background:linear-gradient(90deg,rgba(150,175,205,.10),rgba(150,175,205,.22),rgba(150,175,205,.10)); background-size:200% 100%; border-radius:6px; animation:shimmer 1.3s infinite; }
     @keyframes shimmer { to { background-position:-200% 0; } }
+    @media (max-width:1180px) {
+      .bottom-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .air-panel { grid-column:1 / -1; }
+    }
     @media (max-width:1050px) {
+      .bottom-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .air-panel { grid-column:1 / -1; }
       .metrics { grid-template-columns:repeat(2,1fr); }
       .grid-main { grid-template-columns:1fr; }
       .forecast-list { grid-template-columns:repeat(4,1fr); }
@@ -244,7 +263,7 @@
       .section { margin-top:24px; }
       .section-head { align-items:start; }
       .section-aside { max-width:120px; }
-      .hourly-panel,.chart-panel,.sun-panel,.air-panel { padding:16px; }
+      .hourly-panel,.chart-panel,.sun-panel,.moon-panel,.air-panel { padding:16px; }
       .forecast-list { grid-template-columns:repeat(2,1fr); }
       .day { display:grid; grid-template-columns:1fr auto; text-align:left; align-items:center; padding:12px 13px; column-gap:10px; }
       .day-name,.day-date,.day-desc,.day-temps,.day-rain,.day-wind { grid-column:1; }
@@ -254,6 +273,7 @@
       .detail-grid { grid-template-columns:repeat(2,1fr); gap:9px; }
       .detail { padding:13px; }
       .bottom-grid { grid-template-columns:1fr; }
+      .air-panel { grid-column:auto; }
       .pollutants { grid-template-columns:repeat(2,1fr); }
       .footer { flex-direction:column; }
     }
@@ -320,7 +340,7 @@
       .metric-value { margin-top:9px; font-size:21px; }
       .metric-note { font-size:10px; line-height:1.3; }
       .grid-main { gap:11px; }
-      .hourly-panel,.chart-panel,.sun-panel,.air-panel { padding:15px 13px; border-radius:18px; }
+      .hourly-panel,.chart-panel,.sun-panel,.moon-panel,.air-panel { padding:15px 13px; border-radius:18px; }
       .hourly-strip { gap:8px; margin-right:-3px; padding-bottom:10px; scroll-snap-type:x proximity; }
       .hour { flex-basis:70px; padding:10px 5px 9px; border-radius:13px; scroll-snap-align:start; }
       .hour-icon { margin:8px 0 6px; font-size:22px; }
@@ -349,7 +369,8 @@
       .detail-value { margin-top:8px; font-size:19px; }
       .detail-foot { font-size:9px; line-height:1.35; overflow-wrap:anywhere; }
       .bottom-grid { gap:10px; }
-      .sun-visual { height:104px; }
+      .sun-visual,.moon-visual { height:104px; }
+      .moon-now { width:32px; height:32px; }
       .sun-times strong { font-size:16px; }
       .sun-length { font-size:10px; line-height:1.4; }
       .aqi-number { font-size:29px; }
@@ -473,6 +494,26 @@
         <div class="sun-visual"><div class="sun-track"></div><div class="sun-arc"></div><div class="sun-now" id="sunNow"></div></div>
         <div class="sun-times"><div>SONNENAUFGANG<strong id="sunrise">--:--</strong></div><div>SONNENUNTERGANG<strong id="sunset">--:--</strong></div></div>
         <div class="sun-length" id="daylight">Tageslänge: --</div>
+      </article>
+      <article class="panel moon-panel">
+        <div class="section-head"><div><h2 class="section-title">Mond & Mondphase</h2><div class="section-sub">Mondaufgang und Monduntergang in <span id="moonLocationName">Berlin</span></div></div></div>
+        <div class="moon-visual" role="img" aria-label="Aktuelle Mondposition über dem Horizont">          <div class="sun-track moon-track"></div><div class="sun-arc moon-arc"></div>
+          <div class="moon-now" id="moonNow">
+            <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+              <circle class="moon-disc-shadow" cx="24" cy="24" r="20" />
+              <path class="moon-disc-light" id="moonPhaseShape" d="" />
+            </svg>
+          </div>
+        </div>
+        <div class="sun-times" id="moonTimes">
+          <div id="moonRiseBlock">MONDAUFGANG<strong id="moonrise">--:--</strong></div>
+          <div id="moonSetBlock">MONDUNTERGANG<strong id="moonset">--:--</strong></div>
+        </div>
+        <div class="moon-phase-info">
+          <div class="moon-phase-name" id="moonPhaseName">Mondphase wird berechnet</div>
+          <div class="moon-phase-meta"><span id="moonIllumination">-- % beleuchtet</span><span id="moonAge">Mondalter -- Tage</span></div>
+          <div class="moon-status" id="moonStatus">Astronomische Näherungswerte · Ortszeit</div>
+        </div>
       </article>
       <article class="panel air-panel">
         <div class="section-head"><div><h2 class="section-title">Luftqualität</h2><div class="section-sub">Europäischer Luftqualitätsindex (EAQI)</div></div></div>
@@ -769,6 +810,7 @@
     set('locationTitle', place.name);
     set('locationMeta', placeMeta(place));
     set('sunLocationName', place.name);
+    set('moonLocationName', place.name);
     set('footerLocationName', place.name);
     $('heroSection').setAttribute('aria-label', `Aktuelles Wetter in ${place.name}`);
     document.title = 'Wetter';
@@ -954,8 +996,7 @@
   }
 
   async function loadWeather(forceRefresh = false) {
-    const requestId = ++loadSequence;
-    const place = locations[activeLocationIndex] || DEFAULT_LOCATIONS[0];
+    const requestId = ++loadSequence;    const place = locations[activeLocationIndex] || DEFAULT_LOCATIONS[0];
     const cacheKey = locationCacheKey(place);
     const btn = $('refreshBtn');
     btn.disabled = true;
@@ -1454,8 +1495,7 @@
       } else {
         $('warningTitle').textContent = 'Amtliche Warnmeldungen';
         warningSetStatus(`MoWaS-RSS-Meldungen für ${place.name} konnten nicht abgerufen werden. Das ist keine Aussage über Warnfreiheit. Ursache: ${error.message || 'Netzwerk-/CORS-Fehler'}. Bitte das offizielle Warnportal prüfen.`,'error');
-      }
-    }
+      }    }
   }
 
   // Beim Start werden ausschließlich RSS-Feeds mit bereits gespeicherter
@@ -1467,6 +1507,190 @@
       .map(place => hasUsableStoredWarningRegion(place) ? String(place.warningARS) : '')
       .filter(Boolean))];
     await Promise.allSettled(uniqueArs.map(ars => getRegionalMoWaSRss(ars,false)));
+  }
+
+  // ---- Mondphase und Mondauf/-untergang (lokale Näherungsberechnung) ----
+  // Die Mondphase wird aus dem synodischen Monat berechnet. Auf- und Untergang
+  // werden aus einer vereinfachten Mondbahn mit topozentrischer Korrektur
+  // ermittelt. Die Werte sind astronomische Näherungen, keine Messdaten.
+  const LUNAR_SYNODIC_MONTH = 29.530588853;
+  const KNOWN_NEW_MOON_JD = 2451550.1; // Neumond am 06.01.2000, ca. 18:14 UTC
+  const LUNAR_RAD = Math.PI / 180;
+  const LUNAR_DAY_MS = 86400000;
+
+  function julianDate(date) {
+    return date.getTime() / LUNAR_DAY_MS + 2440587.5;
+  }
+  function getMoonPhase(date) {
+    const age = ((julianDate(date) - KNOWN_NEW_MOON_JD) % LUNAR_SYNODIC_MONTH + LUNAR_SYNODIC_MONTH) % LUNAR_SYNODIC_MONTH;
+    const phase = age / LUNAR_SYNODIC_MONTH;
+    return { phase, age, illumination:(1 - Math.cos(2 * Math.PI * phase)) / 2 };
+  }
+  function moonPhaseLabel(phase) {
+    if (phase < 0.025 || phase >= 0.975) return 'Neumond';
+    if (phase < 0.22) return 'Zunehmende Sichel';
+    if (phase < 0.28) return 'Erstes Viertel';
+    if (phase < 0.47) return 'Zunehmender Mond';
+    if (phase < 0.53) return 'Vollmond';
+    if (phase < 0.72) return 'Abnehmender Mond';
+    if (phase < 0.78) return 'Letztes Viertel';
+    return 'Abnehmende Sichel';
+  }
+  function moonPhasePath(phase, southernHemisphere = false) {
+    const radius = 20, cx = 24, cy = 24, steps = 48;
+    let outerRight = phase <= 0.5;
+    let terminatorRadius = (phase <= 0.5 ? Math.cos(phase * 2 * Math.PI) : -Math.cos(phase * 2 * Math.PI)) * radius;
+    if (southernHemisphere) {
+      outerRight = !outerRight;
+      terminatorRadius = -terminatorRadius;
+    }
+    const points = [];
+    // Außenkante und Terminator werden für die Südhalbkugel gespiegelt.
+    for (let i = 0; i <= steps; i++) {
+      const angle = -Math.PI / 2 + (outerRight ? 1 : -1) * Math.PI * i / steps;
+      points.push([cx + radius * Math.cos(angle), cy + radius * Math.sin(angle)]);
+    }
+    // Terminator: die Breite der Ellipse bildet den beleuchteten Anteil ab.
+    const signedTerminator = terminatorRadius;
+    for (let i = 0; i <= steps; i++) {
+      const angle = Math.PI / 2 - Math.PI * i / steps;
+      points.push([cx + signedTerminator * Math.cos(angle), cy + radius * Math.sin(angle)]);
+    }
+    return 'M ' + points.map(point => point[0].toFixed(2) + ' ' + point[1].toFixed(2)).join(' L ') + ' Z';
+  }
+  function moonEquatorialCoordinates(date) {
+    const days = julianDate(date) - 2451545;
+    const longitude = LUNAR_RAD * (218.316 + 13.176396 * days);
+    const anomaly = LUNAR_RAD * (134.963 + 13.064993 * days);
+    const latitudeArgument = LUNAR_RAD * (93.272 + 13.229350 * days);
+    const eclipticLongitude = longitude + LUNAR_RAD * 6.289 * Math.sin(anomaly);
+    const eclipticLatitude = LUNAR_RAD * 5.128 * Math.sin(latitudeArgument);
+    const obliquity = LUNAR_RAD * 23.4397;
+    const rightAscension = Math.atan2(
+      Math.sin(eclipticLongitude) * Math.cos(obliquity) - Math.tan(eclipticLatitude) * Math.sin(obliquity),
+      Math.cos(eclipticLongitude)
+    );
+    const declination = Math.asin(
+      Math.sin(eclipticLatitude) * Math.cos(obliquity) +
+      Math.cos(eclipticLatitude) * Math.sin(obliquity) * Math.sin(eclipticLongitude)
+    );
+    const distanceKm = 385001 - 20905 * Math.cos(anomaly);
+    return { rightAscension, declination, distanceKm };
+  }
+  function getMoonPosition(date, latitude, longitude) {
+    const days = julianDate(date) - 2451545;
+    const coords = moonEquatorialCoordinates(date);
+    const longitudeWest = -longitude * LUNAR_RAD;
+    const latitudeRad = latitude * LUNAR_RAD;
+    const siderealTime = LUNAR_RAD * (280.16 + 360.9856235 * days) - longitudeWest;
+    const hourAngle = siderealTime - coords.rightAscension;
+    const altitudeGeocentric = Math.asin(
+      Math.sin(latitudeRad) * Math.sin(coords.declination) +
+      Math.cos(latitudeRad) * Math.cos(coords.declination) * Math.cos(hourAngle)
+    );
+    // Horizontparallaxe: bei der nahen Mondbahn relevant für Auf-/Untergang.
+    const parallax = Math.asin(6371 / coords.distanceKm);
+    const altitude = altitudeGeocentric - parallax * Math.cos(altitudeGeocentric);
+    const azimuth = Math.atan2(
+      Math.sin(hourAngle),
+      Math.cos(hourAngle) * Math.sin(latitudeRad) - Math.tan(coords.declination) * Math.cos(latitudeRad)
+    );
+    return { altitude, azimuth };
+  }
+  function zonedDateParts(date, timeZone) {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone, year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'
+    }).formatToParts(date);
+    const values = {};
+    for (const part of parts) if (part.type !== 'literal') values[part.type] = Number(part.value);
+    return values;
+  }
+  function zonedMidnight(year, month, day, timeZone) {
+    // Ermittelt UTC-Zeit des lokalen Tagesbeginns, einschließlich Sommerzeit.
+    const targetUtc = Date.UTC(year, month - 1, day, 0, 0, 0);
+    let guess = new Date(targetUtc);
+    for (let i = 0; i < 3; i++) {
+      const parts = zonedDateParts(guess, timeZone);
+      const representedUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+      guess = new Date(guess.getTime() + targetUtc - representedUtc);
+    }
+    return guess;
+  }
+  function getZonedDayBounds(date, timeZone) {
+    const parts = zonedDateParts(date, timeZone);
+    const start = zonedMidnight(parts.year, parts.month, parts.day, timeZone);
+    const next = new Date(Date.UTC(parts.year, parts.month - 1, parts.day + 1));
+    const end = zonedMidnight(next.getUTCFullYear(), next.getUTCMonth() + 1, next.getUTCDate(), timeZone);
+    return { start, end };
+  }
+  function refineMoonHorizonCrossing(start, end, latitude, longitude, rising) {
+    let low = start.getTime(), high = end.getTime();
+    for (let i = 0; i < 18; i++) {
+      const middle = (low + high) / 2;
+      const altitude = getMoonPosition(new Date(middle), latitude, longitude).altitude / LUNAR_RAD + 0.3;
+      if ((altitude >= 0) === rising) high = middle;
+      else low = middle;
+    }
+    return new Date((low + high) / 2);
+  }
+  function getMoonRiseSet(date, latitude, longitude, timeZone) {
+    const { start, end } = getZonedDayBounds(date, timeZone);
+    const duration = end.getTime() - start.getTime();
+    const stepMs = 30 * 60 * 1000;
+    let previousTime = start;
+    let previousAltitude = getMoonPosition(previousTime, latitude, longitude).altitude / LUNAR_RAD + 0.3;
+    let rise = null, set = null;
+    for (let elapsed = stepMs; elapsed <= duration; elapsed += stepMs) {
+      const currentTime = new Date(Math.min(start.getTime() + elapsed, end.getTime()));
+      const currentAltitude = getMoonPosition(currentTime, latitude, longitude).altitude / LUNAR_RAD + 0.3;
+      if (previousAltitude < 0 && currentAltitude >= 0 && rise === null) {
+        rise = refineMoonHorizonCrossing(previousTime, currentTime, latitude, longitude, true);
+      } else if (previousAltitude >= 0 && currentAltitude < 0 && set === null) {
+        set = refineMoonHorizonCrossing(previousTime, currentTime, latitude, longitude, false);
+      }
+      previousTime = currentTime;
+      previousAltitude = currentAltitude;
+      if (currentTime.getTime() >= end.getTime()) break;
+    }
+    return { rise, set };
+  }
+  function moonTimeFormat(date, timeZone) {
+    return date ? new Intl.DateTimeFormat('de-DE', { hour:'2-digit', minute:'2-digit', timeZone }).format(date) : '–';
+  }
+  function renderMoon(place) {
+    const latitude = Number(place.latitude), longitude = Number(place.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+    const now = new Date();
+    const phaseData = getMoonPhase(now);
+    const phaseName = moonPhaseLabel(phaseData.phase);
+    const southernHemisphere = latitude < 0;
+    $('moonPhaseShape').setAttribute('d', moonPhasePath(phaseData.phase, southernHemisphere));
+    $('moonPhaseName').textContent = phaseName;
+    $('moonIllumination').textContent = `${Math.round(phaseData.illumination * 100)} % beleuchtet`;
+    $('moonAge').textContent = `Mondalter ${fmt(phaseData.age, 1)} Tage`;
+    $('moonNow').setAttribute('aria-label', `${phaseName}, ${Math.round(phaseData.illumination * 100)} Prozent beleuchtet`);
+
+    const position = getMoonPosition(now, latitude, longitude);
+    const azimuthFraction = Math.max(0, Math.min(1, (position.azimuth + Math.PI / 2) / Math.PI));
+    const altitudeFraction = Math.sin(Math.max(0, Math.min(Math.PI / 2, position.altitude)));
+    $('moonNow').style.setProperty('--moon-x', `${5 + azimuthFraction * 90}%`);
+    $('moonNow').style.setProperty('--moon-y', `${altitudeFraction * 47}px`);
+    $('moonNow').classList.toggle('below-horizon', position.altitude < 0);
+
+    const times = getMoonRiseSet(now, latitude, longitude, activeTimezone || 'Europe/Berlin');
+    set('moonrise', moonTimeFormat(times.rise, activeTimezone || 'Europe/Berlin'));
+    set('moonset', moonTimeFormat(times.set, activeTimezone || 'Europe/Berlin'));
+    // Mondaufgang und -untergang können an einem Kalendertag in wechselnder
+    // Reihenfolge auftreten. Die beiden Angaben werden deshalb chronologisch angeordnet.
+    const riseBlock = $('moonRiseBlock'), setBlock = $('moonSetBlock');
+    if (times.rise && times.set && times.set < times.rise) $('moonTimes').replaceChildren(setBlock, riseBlock);
+    else $('moonTimes').replaceChildren(riseBlock, setBlock);
+    let status = position.altitude >= 0 ? 'Der Mond steht derzeit über dem Horizont.' : 'Der Mond befindet sich derzeit unter dem Horizont.';
+    if (!times.rise && !times.set) status = 'Heute kein Mondaufgang und kein Monduntergang.';
+    else if (!times.rise) status += ' Heute kein Mondaufgang.';
+    else if (!times.set) status += ' Heute kein Monduntergang.';
+    set('moonStatus', `${status} · Näherungswerte`);
   }
 
   function renderWeather(d) {
@@ -1499,6 +1723,7 @@
     const progress = Math.max(0,Math.min(1,(now-start)/(end-start)));
     $('sunNow').style.setProperty('--sun-x',`${5 + progress*90}%`);
     $('sunNow').style.setProperty('--sun-y',`${Math.sin(progress*Math.PI)*47}px`);
+    renderMoon(locations[activeLocationIndex] || DEFAULT_LOCATIONS[0]);
     renderHourly(h,idx); renderChart(h,idx); renderDays(day);
     set('dateLine',dateFmt(day.time[0],{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
   }
