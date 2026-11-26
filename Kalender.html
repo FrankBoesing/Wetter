@@ -142,6 +142,15 @@
     .holiday-label { display:block; margin-top:7px; color:var(--holiday-text); font-size:var(--holiday-font); line-height:1.2; font-weight:650; overflow-wrap:anywhere; hyphens:auto; }
     .holiday-symbol { display:inline-block; color:var(--holiday-color); margin-right:3px; font-size:9px; line-height:1.2; }
     .holiday-label-text { display:inline; }
+    .event-label { display:block; margin-top:5px; font-size:9px; line-height:1.15; font-weight:650; overflow-wrap:anywhere; }
+    .event-label.lunar { color:#d9caff; }
+    .event-label.season { color:#ffd49e; }
+    .event-label.meteorological { color:#9fe2c2; }
+    .event-label.eclipse { color:#ff9ca9; }
+    .event-label-compact { display:none; }
+    .day-cell.has-events:not(.holiday) { border-color:rgba(168,139,255,.20); }
+    .day-cell.has-events:not(.holiday):not(.today) { background:linear-gradient(180deg,rgba(168,139,255,.075),rgba(118,155,194,.045)); }
+    .day-cell.has-eclipse:not(.holiday):not(.today) { border-color:rgba(255,143,155,.34); background:linear-gradient(180deg,rgba(255,143,155,.10),rgba(118,155,194,.045)); }
     .scope-mini { align-self:flex-start; display:inline-flex; margin:5px 0 0 12px; padding:2px 5px; border-radius:5px; background:rgba(117,170,255,.12); color:#b7d0ff; font-size:8px; line-height:1.2; letter-spacing:.04em; font-weight:800; }
     .calendar-legend { display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin-top:17px; padding-top:14px; border-top:1px solid rgba(164,190,220,.10); color:#91a7c0; font-size:10px; }
     .legend-item { display:inline-flex; align-items:center; gap:7px; }
@@ -149,6 +158,8 @@
     .legend-swatch.today { border:2px solid var(--cyan); background:rgba(105,221,237,.13); }
     .legend-swatch.holiday { border-color:color-mix(in srgb,var(--holiday-color) 55%,transparent); background:color-mix(in srgb,var(--holiday-color) 22%,transparent); }
     .legend-swatch.weekend { background:rgba(118,155,194,.15); }
+    .legend-swatch.event { border-color:rgba(168,139,255,.40); background:rgba(168,139,255,.25); }
+    .legend-swatch.eclipse { border-color:rgba(255,143,155,.55); background:rgba(255,143,155,.30); }
 
     .sidebar { display:grid; gap:13px; }
     .next-card { position:relative; overflow:hidden; padding:20px; background:linear-gradient(145deg,rgba(25,65,83,.90),rgba(21,43,68,.90) 65%,rgba(38,43,79,.88)); border-color:rgba(105,221,237,.19); }
@@ -179,7 +190,10 @@
     .month-holiday-count { color:#8ca4bf; font-size:10px; white-space:nowrap; }
     .mini-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:3px; text-align:center; }
     .mini-weekday { color:#768da8; font-size:9px; font-weight:750; padding:3px 0 5px; }
-    .mini-day { display:flex; justify-content:center; align-items:center; min-width:0; aspect-ratio:1; border-radius:6px; color:#b7c6d8; font-size:10px; font-variant-numeric:tabular-nums; }
+    .mini-day { position:relative; display:flex; justify-content:center; align-items:center; min-width:0; aspect-ratio:1; border-radius:6px; color:#b7c6d8; font-size:10px; font-variant-numeric:tabular-nums; }
+    .mini-day.has-event::after { content:""; position:absolute; width:4px; height:4px; right:2px; bottom:2px; border-radius:50%; background:#b99aff; box-shadow:0 0 5px rgba(168,139,255,.45); }
+    .mini-day.has-event.has-season::after { background:#ffbd75; box-shadow:0 0 5px rgba(255,189,117,.35); }
+    .mini-day.has-event.has-eclipse::after { background:#ff8f9b; box-shadow:0 0 6px rgba(255,143,155,.55); }
     .mini-day.empty { visibility:hidden; }
     .mini-day.weekend { color:#8299b4; }
     .mini-day.today { outline:1px solid var(--cyan); color:#eaffff; background:rgba(105,221,237,.12); }
@@ -213,7 +227,7 @@
     .dialog-title { margin:8px 0 0; font-size:24px; line-height:1.15; letter-spacing:-.035em; }
     .dialog-close { width:34px; height:34px; flex:0 0 auto; display:grid; place-items:center; border:1px solid var(--line); border-radius:10px; color:var(--soft); background:rgba(17,31,50,.65); cursor:pointer; }
     .dialog-date { color:#b5c9df; font-size:13px; margin-top:15px; }
-    .dialog-description { color:#aebfd2; font-size:12px; line-height:1.65; margin-top:15px; }
+    .dialog-description { color:#aebfd2; font-size:12px; line-height:1.65; margin-top:15px; white-space:pre-line; }
     .dialog-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px solid rgba(164,190,220,.10); }
     .dialog-source { color:#748ca7; font-size:10px; margin-top:13px; line-height:1.5; }
     .dialog-footer { display:flex; justify-content:flex-end; margin-top:19px; }
@@ -278,6 +292,9 @@
       .day-cell { min-height:78px; padding:5px 3px 5px; border-radius:9px; }
       .day-number { min-width:20px; height:21px; padding:0 4px; border-radius:7px; font-size:10px; }
       .holiday-label { margin-top:5px; font-size:calc(var(--holiday-font) - 2.5px); line-height:1.13; font-weight:650; }
+      .event-label { margin-top:3px; font-size:7.2px; line-height:1.08; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; overflow-wrap:normal; }
+      .event-label-wide { display:none; }
+      .event-label-compact { display:inline; }
       .holiday-symbol { margin-right:2px; font-size:7px; }
       .scope-mini { margin:4px 0 0 7px; padding:1px 3px; font-size:7px; }
       .calendar-legend { gap:8px 12px; margin-top:12px; padding-top:11px; font-size:9px; }
@@ -323,6 +340,7 @@
       .day-cell { min-height:73px; padding:4px 2px; }
       .day-number { min-width:18px; height:19px; font-size:9px; }
       .holiday-label { font-size:calc(var(--holiday-font) - 3.5px); }
+      .event-label { margin-top:2px; font-size:6.2px; line-height:1.04; }
       .calendar-grid.with-weeks { grid-template-columns:16px repeat(7,minmax(0,1fr)); }
       .year-month { padding:9px 6px; }
     }
@@ -356,7 +374,7 @@
       <div class="section-head">
         <div><h2 class="section-title" id="setupTitle">Kalender-Einstellungen</h2><div class="section-sub" id="setupStateSubtitle">Darstellung und Bundesland auswählen</div></div>
       </div>
-      <p class="setup-intro">Wähle dein Bundesland und passe die Darstellung an. Regionale Sonderfälle (zum Beispiel Mariä Himmelfahrt in Teilen Bayerns) werden gesondert gekennzeichnet. Termine, Ereignisse und Erinnerungen werden nicht verwaltet. Einstellungen werden lokal in diesem Browser gespeichert, sofern localStorage verfügbar ist.</p>
+      <p class="setup-intro">Wähle dein Bundesland und passe die Darstellung an. Regionale Sonderfälle (zum Beispiel Mariä Himmelfahrt in Teilen Bayerns) werden gesondert gekennzeichnet. Persönliche Termine, eigene Ereignisse und Erinnerungen werden nicht verwaltet. Einstellungen werden lokal in diesem Browser gespeichert, sofern localStorage verfügbar ist.</p>
       <div class="setup-grid">
         <label class="setup-field" for="federalState">Bundesland
           <select id="federalState">
@@ -428,13 +446,15 @@
             <span class="legend-item"><i class="legend-swatch today"></i>Heute</span>
             <span class="legend-item"><i class="legend-swatch holiday"></i>Gesetzlicher Feiertag</span>
             <span class="legend-item"><i class="legend-swatch weekend"></i>Wochenende</span>
+            <span class="legend-item"><i class="legend-swatch event"></i>Jahreszeiten & Mondphasen</span>
+            <span class="legend-item"><i class="legend-swatch eclipse"></i>Mondfinsternis in Deutschland</span>
             <span class="legend-item"><span style="color:var(--holiday-color);font-weight:900">✦</span> Feiertagsdetails per Klick</span>
           </div>
         </div>
 
         <div id="yearView" hidden>
           <div class="year-grid" id="yearGrid" aria-label="Jahresübersicht"></div>
-          <p class="year-note">Feiertage sind farblich markiert und unter dem jeweiligen Monat mit Datum und Kurzbezeichnung aufgeführt. Ein Klick auf einen Monatsnamen öffnet dessen Monatsansicht.</p>
+          <p class="year-note">Feiertage sind farblich markiert. Violette und orange Punkte zeigen Mondphasen und Jahreszeiten; rosafarbene Punkte markieren in Deutschland sichtbare Mondfinsternisse. Ein Klick auf einen Monatsnamen öffnet dessen Monatsansicht.</p>
         </div>
 
         <div id="holidaysView" hidden>
@@ -463,6 +483,8 @@
             <span class="legend-item"><i class="legend-swatch today"></i>Heutiger Tag</span>
             <span class="legend-item"><i class="legend-swatch holiday"></i>Gesetzlicher Feiertag</span>
             <span class="legend-item"><i class="legend-swatch weekend"></i>Samstag und Sonntag</span>
+            <span class="legend-item"><i class="legend-swatch event"></i>Mondphasen und Jahreszeiten</span>
+            <span class="legend-item"><i class="legend-swatch eclipse"></i>Mondfinsternis (Deutschland)</span>
             <span class="legend-item"><span class="scope-pill">DE</span> Gilt bundesweit</span>
             <span class="legend-item"><span class="scope-pill state">Land</span> Zusätzlich im gewählten Bundesland</span>
             <span class="legend-item"><span class="scope-pill regional">Regional</span> Gilt nur in bestimmten Orten</span>
@@ -472,8 +494,8 @@
     </div>
 
     <footer class="footer">
-      <div><strong id="footerStateName">Kalender · Nordrhein-Westfalen</strong><br>Reiner Anzeige-Kalender ohne Termine, Ereignisverwaltung oder Erinnerungen.</div>
-      <div>Rechtsgrundlage: Feiertagsrecht des ausgewählten Bundeslandes<br>Feiertagsdaten und Osterberechnung werden vollständig lokal erzeugt.</div>
+      <div><strong id="footerStateName">Kalender · Nordrhein-Westfalen</strong><br>Reiner Anzeige-Kalender ohne persönliche Termine, Ereigniseingabe oder Erinnerungen.</div>
+      <div>Rechtsgrundlage: Feiertagsrecht des ausgewählten Bundeslandes<br>Feiertage, Mondphasen und Jahreszeiten werden lokal berechnet; Mondfinsternisse für Deutschland sind als feste Termine hinterlegt.</div>
     </footer>
   </main>
 
@@ -533,6 +555,31 @@
     let selectedDate = makeLocalDate(today.getFullYear(), today.getMonth(), 1);
     let currentView = settings.defaultView;
     let holidayCache = new Map();
+    // Sichtbare Mondfinsternisse in Deutschland 2027–2036.
+    // Die Daten sind bewusst fest hinterlegt: Nur Finsternisse, die in Deutschland
+    // sichtbar sind, werden angezeigt. Als Tagesdatum gilt der lokale Starttag;
+    // einzelne Ereignisse reichen bis in den Folgetag. Uhrzeiten werden nicht geführt.
+    const GERMANY_LUNAR_ECLIPSES = Object.freeze([
+      {date:'2027-02-20',type:'penumbral',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Die Finsternis beginnt am Abend des 20. Februar und reicht in die Nacht zum 21. Februar 2027.'},
+      {date:'2028-01-12',type:'partial',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Ein Teil des Mondes tritt in den Kernschatten der Erde ein.'},
+      {date:'2028-07-06',type:'partial',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Ein Teil des Mondes tritt in den Kernschatten der Erde ein.'},
+      {date:'2028-12-31',type:'total',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond tritt vollständig in den Kernschatten der Erde ein.'},
+      {date:'2029-06-26',type:'total',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond tritt vollständig in den Kernschatten der Erde ein.'},
+      {date:'2029-12-20',type:'total',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Die Finsternis beginnt am Abend des 20. Dezember und reicht in die Nacht zum 21. Dezember 2029.'},
+      {date:'2030-06-15',type:'partial',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Ein Teil des Mondes tritt in den Kernschatten der Erde ein.'},
+      {date:'2030-12-09',type:'penumbral',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond durchquert den Halbschatten der Erde.'},
+      {date:'2031-05-07',type:'penumbral',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond durchquert den Halbschatten der Erde.'},
+      {date:'2031-10-30',type:'penumbral',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond durchquert den Halbschatten der Erde.'},
+      {date:'2032-10-18',type:'total',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond tritt vollständig in den Kernschatten der Erde ein.'},
+      {date:'2033-04-14',type:'total',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond tritt vollständig in den Kernschatten der Erde ein.'},
+      {date:'2034-04-03',type:'penumbral',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond durchquert den Halbschatten der Erde.'},
+      {date:'2034-09-28',type:'partial',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Ein Teil des Mondes tritt in den Kernschatten der Erde ein.'},
+      {date:'2035-08-19',type:'partial',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Ein Teil des Mondes tritt in den Kernschatten der Erde ein.'},
+      {date:'2036-02-11',type:'total',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond tritt vollständig in den Kernschatten der Erde ein.'},
+      {date:'2036-08-07',type:'total',name:'Mondfinsternis',shortLabel:'🌘 Mondfinsternis',mobileLabel:'Finsternis',description:'In Deutschland sichtbar. Der Mond tritt vollständig in den Kernschatten der Erde ein.'}
+    ]);
+
+    let calendarEventCache = new Map();
 
     // setFullYear statt new Date(year, ...) vermeidet die JS-Sonderbehandlung
     // der Jahre 0 bis 99 als 1900 bis 1999.
@@ -554,6 +601,155 @@
     }
     function formatLongDate(date) {
       return formatDate(date,{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    }
+
+    function formatLocalTime(date) {
+      return new Intl.DateTimeFormat('de-DE',{hour:'2-digit',minute:'2-digit'}).format(date);
+    }
+    const DEG_TO_RAD = Math.PI / 180;
+    const SEASON_PERIODIC_TERMS = [
+      [485,324.96,1934.136],[203,337.23,32964.467],[199,342.08,20.186],
+      [182,27.85,445267.112],[156,73.14,45036.886],[136,171.52,22518.443],
+      [77,222.54,65928.934],[74,296.72,3034.906],[70,243.58,9037.513],
+      [58,119.81,33718.147],[52,297.17,150.678],[50,21.02,2281.226],
+      [45,247.54,29929.562],[44,325.15,31555.956],[29,60.93,4443.417],
+      [18,155.12,67555.328],[17,288.79,4562.452],[16,198.04,62894.029],
+      [14,199.76,31436.921],[12,95.39,14577.848],[12,287.11,31931.756],
+      [12,320.81,34777.259],[9,227.73,1222.114],[8,15.45,16859.074]
+    ];
+    function getDeltaTSeconds(year) {
+      // Espenak/Meeus piecewise approximation. ΔT converts Terrestrial Time
+      // used by the orbital formulae to Universal Time; near the present this
+      // remains an approximation of a few seconds, not a precision time service.
+      if (year >= 2005 && year <= 2050) {
+        const t=year-2000;
+        return 62.92+0.32217*t+0.005589*t*t;
+      }
+      if (year >= 1986 && year < 2005) {
+        const t=year-2000;
+        return 63.86+0.3345*t-0.060374*t*t+0.0017275*t**3+0.000651814*t**4+0.00002373599*t**5;
+      }
+      if (year > 2050 && year <= 2150) {
+        const u=(year-1820)/100;
+        return -20+32*u*u-0.5628*(2150-year);
+      }
+      if (year >= 1900 && year < 1986) {
+        const t=year-1900;
+        if (year < 1920) return -2.79+1.494119*t-0.0598939*t*t+0.0061966*t**3-0.000197*t**4;
+        if (year < 1941) { const u=year-1920; return 21.20+0.84493*u-0.0761*u*u+0.0020936*u**3; }
+        if (year < 1961) { const u=year-1950; return 29.07+0.407*u-u*u/233+u**3/2547; }
+        const u=year-1975;
+        return 45.45+1.067*u-u*u/260-u**3/718;
+      }
+      const u=(year-1820)/100;
+      return -20+32*u*u;
+    }
+    function julianEphemerisToDate(jde) {
+      // Convert JDE (TT) to a local Date after the estimated TT-UT correction.
+      const approximateYear=2000+(jde-2451545)/365.2425;
+      const jdUT=jde-getDeltaTSeconds(approximateYear)/86400;
+      return new Date((jdUT-2440587.5)*86400000);
+    }
+    function normalizeDegrees(value) { return ((value%360)+360)%360; }
+    function lunarPhaseJDE(k,phase) {
+      // Meeus, Astronomical Algorithms, chapter 49: new/full/quarter phase.
+      const T=k/1236.85, T2=T*T, T3=T2*T, T4=T3*T;
+      const E=1-0.002516*T-0.0000074*T2;
+      const M=(2.5534+29.10535670*k-0.0000014*T2-0.00000011*T3)*DEG_TO_RAD;
+      const Mp=(201.5643+385.81693528*k+0.0107582*T2+0.00001238*T3-0.000000058*T4)*DEG_TO_RAD;
+      const F=(160.7108+390.67050284*k-0.0016118*T2-0.00000227*T3+0.000000011*T4)*DEG_TO_RAD;
+      const Om=(124.7746-1.56375588*k+0.0020672*T2+0.00000215*T3)*DEG_TO_RAD;
+      const jde0=2451550.09766+29.530588861*k+0.00015437*T2-0.000000150*T3+0.00000000073*T4;
+      let correction;
+      if (phase==='new') {
+        correction=-0.40720*Math.sin(Mp)+0.17241*E*Math.sin(M)+0.01608*Math.sin(2*Mp)+0.01039*Math.sin(2*F)+0.00739*E*Math.sin(Mp-M)-0.00514*E*Math.sin(Mp+M)+0.00208*E*E*Math.sin(2*M)-0.00111*Math.sin(Mp-2*F)-0.00057*Math.sin(Mp+2*F)+0.00056*E*Math.sin(2*Mp+M)-0.00042*Math.sin(3*Mp)+0.00042*E*Math.sin(M+2*F)+0.00038*E*Math.sin(M-2*F)-0.00024*E*Math.sin(2*Mp-M)-0.00017*Math.sin(Om)-0.00007*Math.sin(Mp+2*M)+0.00004*Math.sin(2*Mp-2*F)+0.00004*Math.sin(3*M+Mp)+0.00003*Math.sin(Mp+M-2*F)+0.00003*Math.sin(2*Mp+2*F)-0.00003*Math.sin(Mp+M+2*F)+0.00003*Math.sin(Mp-M+2*F)-0.00002*Math.sin(Mp-M-2*F)-0.00002*Math.sin(3*Mp+M)+0.00002*Math.sin(4*Mp);
+      } else if (phase==='full') {
+        correction=-0.40614*Math.sin(Mp)+0.17302*E*Math.sin(M)+0.01614*Math.sin(2*Mp)+0.01043*Math.sin(2*F)+0.00734*E*Math.sin(Mp-M)-0.00515*E*Math.sin(Mp+M)+0.00209*E*E*Math.sin(2*M)-0.00111*Math.sin(Mp-2*F)-0.00057*Math.sin(Mp+2*F)+0.00056*E*Math.sin(2*Mp+M)-0.00042*Math.sin(3*Mp)+0.00042*E*Math.sin(M+2*F)+0.00038*E*Math.sin(M-2*F)-0.00024*E*Math.sin(2*Mp-M)-0.00017*Math.sin(Om)-0.00007*Math.sin(Mp+2*M)+0.00004*Math.sin(2*Mp-2*F)+0.00004*Math.sin(3*M+Mp)+0.00003*Math.sin(Mp+M-2*F)+0.00003*Math.sin(2*Mp+2*F)-0.00003*Math.sin(Mp+M+2*F)+0.00003*Math.sin(Mp-M+2*F)-0.00002*Math.sin(Mp-M-2*F)-0.00002*Math.sin(3*Mp+M)+0.00002*Math.sin(4*Mp);
+      } else {
+        correction=-0.62801*Math.sin(Mp)+0.17172*E*Math.sin(M)-0.01183*E*Math.sin(Mp+M)+0.00862*Math.sin(2*Mp)+0.00804*Math.sin(2*F)+0.00454*E*Math.sin(Mp-M)+0.00204*E*E*Math.sin(2*M)-0.00180*Math.sin(Mp-2*F)-0.00070*Math.sin(Mp+2*F)-0.00040*Math.sin(3*Mp)-0.00034*E*Math.sin(2*Mp-M)+0.00032*E*Math.sin(M+2*F)+0.00032*E*Math.sin(M-2*F)-0.00028*E*E*Math.sin(Mp+2*M)+0.00027*E*Math.sin(2*Mp+M)-0.00017*Math.sin(Om)-0.00005*Math.sin(Mp-M-2*F)+0.00004*Math.sin(2*Mp+2*F)-0.00004*Math.sin(Mp+M+2*F)+0.00004*Math.sin(Mp-2*M)+0.00003*Math.sin(Mp+M-2*F)+0.00003*Math.sin(3*M)+0.00002*Math.sin(2*Mp-2*F)+0.00002*Math.sin(Mp-M+2*F)-0.00002*Math.sin(3*Mp+M);
+        const W=0.00306-0.00038*E*Math.cos(M)+0.00026*Math.cos(Mp)-0.00002*Math.cos(Mp-M)+0.00002*Math.cos(Mp+M)+0.00002*Math.cos(2*F);
+        correction+=phase==='first'?W:-W;
+      }
+      return jde0+correction;
+    }
+    function getSeasonJDE(year,index) {
+      // Meeus chapter 27: equinoxes and solstices, valid approximately 1000–3000.
+      const T=(year-2000)/1000, T2=T*T, T3=T2*T, T4=T3*T;
+      const bases=[
+        2451623.80984+365242.37404*T+0.05169*T2-0.00411*T3-0.00057*T4,
+        2451716.56767+365241.62603*T+0.00325*T2+0.00888*T3-0.00030*T4,
+        2451810.21715+365242.01767*T-0.11575*T2+0.00337*T3+0.00078*T4,
+        2451900.05952+365242.74049*T-0.06223*T2-0.00823*T3+0.00032*T4
+      ];
+      const W=(35999.373*T-2.47)*DEG_TO_RAD;
+      const sum=SEASON_PERIODIC_TERMS.reduce((total,[A,B,C])=>total+A*Math.cos((B+C*T)*DEG_TO_RAD),0);
+      const correction=0.00001*sum/(1+0.0334*Math.cos(W)+0.0007*Math.cos(2*W));
+      return bases[index]+correction;
+    }
+    function addCalendarEvent(map,event) {
+      const key=dateKey(event.date);
+      if (!map.has(key)) map.set(key,[]);
+      map.get(key).push(event);
+    }
+    function getCalendarEvents(year) {
+      if (calendarEventCache.has(year)) return calendarEventCache.get(year);
+      const events=[];
+      const meteorological=[
+        {month:2,name:'Meteorologischer Frühlingsanfang',shortLabel:'M · Frühling',mobileLabel:'M Frühling',description:'Der meteorologische Frühling beginnt am 1. März.'},
+        {month:5,name:'Meteorologischer Sommeranfang',shortLabel:'M · Sommer',mobileLabel:'M Sommer',description:'Der meteorologische Sommer beginnt am 1. Juni.'},
+        {month:8,name:'Meteorologischer Herbstanfang',shortLabel:'M · Herbst',mobileLabel:'M Herbst',description:'Der meteorologische Herbst beginnt am 1. September.'},
+        {month:11,name:'Meteorologischer Winteranfang',shortLabel:'M · Winter',mobileLabel:'M Winter',description:'Der meteorologische Winter beginnt am 1. Dezember.'}
+      ];
+      meteorological.forEach(item=>events.push({type:'meteorological',name:item.name,shortLabel:item.shortLabel,date:makeLocalDate(year,item.month,1),time:'',mobileLabel:item.mobileLabel,description:item.description,categoryLabel:'Meteorologische Jahreszeit'}));
+      const seasons=[
+        {index:0,name:'Astronomischer Frühlingsanfang',shortLabel:'☼ Frühling',mobileLabel:'A Frühling',description:'Frühlings-Äquinoktium: Die Sonne überquert den Himmelsäquator nach Norden.'},
+        {index:1,name:'Astronomischer Sommeranfang',shortLabel:'☼ Sommer',mobileLabel:'A Sommer',description:'Sommersonnenwende: Die Sonne erreicht auf der Nordhalbkugel ihre größte Mittagshöhe.'},
+        {index:2,name:'Astronomischer Herbstanfang',shortLabel:'☼ Herbst',mobileLabel:'A Herbst',description:'Herbst-Äquinoktium: Die Sonne überquert den Himmelsäquator nach Süden.'},
+        {index:3,name:'Astronomischer Winteranfang',shortLabel:'☼ Winter',mobileLabel:'A Winter',description:'Wintersonnenwende: Die Sonne erreicht auf der Nordhalbkugel ihre geringste Mittagshöhe.'}
+      ];
+      seasons.forEach(item=>{
+        const date=julianEphemerisToDate(getSeasonJDE(year,item.index));
+        events.push({type:'season',name:item.name,shortLabel:item.shortLabel,date,time:formatLocalTime(date),mobileLabel:item.mobileLabel,description:item.description+' Der Zeitpunkt wird lokal astronomisch angenähert.',categoryLabel:'Astronomischer Jahreszeitenwechsel'});
+      });
+      const baseK=Math.floor((year-2000)*12.3685)-2;
+      const phases=[
+        {offset:0,phase:'new',name:'Neumond',shortLabel:'🌑 Neumond',mobileLabel:'Neumond',description:'Mond und Sonne stehen nahezu in derselben Richtung; die beleuchtete Seite zeigt überwiegend von der Erde weg.'},
+        {offset:0.25,phase:'first',name:'Erstes Viertel',shortLabel:'🌓 Erstes Viertel',mobileLabel:'1. Viertel',description:'Der Mond hat etwa ein Viertel seiner Umlaufbahn seit Neumond zurückgelegt; von der Erde ist die rechte Hälfte der sichtbaren Scheibe beleuchtet.'},
+        {offset:0.5,phase:'full',name:'Vollmond',shortLabel:'🌕 Vollmond',mobileLabel:'Vollmond',description:'Der Mond steht der Sonne am Himmel ungefähr gegenüber; seine sichtbare Scheibe ist nahezu vollständig beleuchtet.'},
+        {offset:0.75,phase:'last',name:'Letztes Viertel',shortLabel:'🌗 Letztes Viertel',mobileLabel:'Letztes V.',description:'Der Mond hat etwa drei Viertel seiner Umlaufbahn seit Neumond zurückgelegt; von der Erde ist die linke Hälfte der sichtbaren Scheibe beleuchtet.'}
+      ];
+      for (let lunation=baseK;lunation<=baseK+15;lunation++) {
+        phases.forEach(item=>{
+          const date=julianEphemerisToDate(lunarPhaseJDE(lunation+item.offset,item.phase));
+          if (date.getFullYear()===year) events.push({type:'lunar',name:item.name,shortLabel:item.shortLabel,date,time:formatLocalTime(date),mobileLabel:item.mobileLabel,description:item.description,categoryLabel:'Mondphase'});
+        });
+      }
+      GERMANY_LUNAR_ECLIPSES.forEach(item=>{
+        const [eventYear,eventMonth,eventDay]=item.date.split('-').map(Number);
+        if (eventYear!==year) return;
+        const date=makeLocalDate(eventYear,eventMonth-1,eventDay);
+        const typeText=item.type==='total'?'Weltweit totale Mondfinsternis.':item.type==='partial'?'Weltweit partielle Mondfinsternis.':'Weltweit Halbschatten-Mondfinsternis.';
+        const locationText=item.date==='2028-07-06'
+          ? ' In Deutschland sichtbar; je nach Bundesland ist entweder ein partieller Abschnitt oder nur der Halbschatten zu sehen.'
+          : ' In Deutschland sichtbar; der tatsächlich beobachtbare Verlauf hängt von Mondhöhe und Standort ab.';
+        events.push({
+          type:'eclipse',eclipseType:item.type,name:item.name,shortLabel:item.shortLabel,
+          mobileLabel:item.mobileLabel,date,time:'',description:typeText+locationText+' '+item.description,
+          categoryLabel:'Mondfinsternis · Deutschland'
+        });
+      });
+      // An Finsternistagen keine Phasenuhrzeit für den ebenfalls auftretenden Vollmond anzeigen.
+      const eclipseDays=new Set(events.filter(item=>item.type==='eclipse').map(item=>dateKey(item.date)));
+      events.forEach(item=>{if (item.type==='lunar' && eclipseDays.has(dateKey(item.date))) item.time='';});
+      events.sort((a,b)=>a.date-b.date);
+      calendarEventCache.set(year,events);
+      return events;
+    }
+    function getCalendarEventMap(year) {
+      const map=new Map();
+      [year-1,year,year+1].forEach(eventYear=>getCalendarEvents(eventYear).forEach(event=>addCalendarEvent(map,event)));
+      map.forEach(items=>items.sort((a,b)=>a.date-b.date));
+      return map;
     }
 
     // Meeus/Jones/Butcher: gregorianische Osterformel; liefert den Ostersonntag
@@ -865,6 +1061,7 @@
       const month = selectedDate.getMonth();
       const firstDay = settings.firstDay;
       const holidays = getHolidayMap(year);
+      const eventsByDay = getCalendarEventMap(year);
       const grid = $('monthGrid');
       grid.innerHTML = '';
       grid.classList.toggle('with-weeks',settings.showWeeks);
@@ -903,19 +1100,25 @@
           const date = addDays(rowStart,dayIndex);
           const key = dateKey(date);
           const holiday = holidays.get(key) || null;
+          const dayEvents = eventsByDay.get(key) || [];
+          const hasDetails = Boolean(holiday) || dayEvents.length>0;
           const isToday = sameDate(date,today);
           const inMonth = date.getMonth()===month;
           const isWeekend = date.getDay()===0 || date.getDay()===6;
-          const cell = document.createElement(holiday?'button':'div');
-          if (holiday) cell.type = 'button';
-          cell.className = `day-cell${isWeekend?' weekend':''}${!inMonth?' outside-month':''}${isToday?' today':''}${holiday?' holiday':''}`;
-          if (holiday) {
-            cell.title = `${formatLongDate(date)} · ${holiday.name} · ${holiday.scopeDescription}`;
-            cell.setAttribute('aria-label',`${formatLongDate(date)}: ${holiday.name}. ${holiday.scopeDescription} Details anzeigen.`);
-            cell.addEventListener('click',()=>showHolidayDetails(holiday));
+          const cell = document.createElement(hasDetails?'button':'div');
+          if (hasDetails) {
+            cell.type = 'button';
+            const titleParts=[];
+            if (holiday) titleParts.push(holiday.name);
+            dayEvents.forEach(item=>titleParts.push(`${item.name}${item.time?` · ${item.time} Uhr`:''}`));
+            cell.title = `${formatLongDate(date)} · ${titleParts.join(' · ')}`;
+            cell.setAttribute('aria-label',`${formatLongDate(date)}: ${titleParts.join('. ')}. Details anzeigen.`);
+            cell.addEventListener('click',()=>showDayDetails(date,holiday,dayEvents));
           } else {
             cell.setAttribute('aria-label',formatLongDate(date));
           }
+          const hasEclipse=dayEvents.some(item=>item.type==='eclipse');
+          cell.className = `day-cell${isWeekend?' weekend':''}${!inMonth?' outside-month':''}${isToday?' today':''}${holiday?' holiday':''}${dayEvents.length?' has-events':''}${hasEclipse?' has-eclipse':''}`;
           const number = document.createElement('span');
           number.className = 'day-number';
           number.textContent = String(date.getDate());
@@ -933,6 +1136,13 @@
               cell.appendChild(scope);
             }
           }
+          dayEvents.forEach(item=>{
+            const label=document.createElement('span');
+            label.className=`event-label ${item.type}`;
+            label.innerHTML=`<span class="event-label-wide">${escapeHTML(item.shortLabel)}</span><span class="event-label-compact">${escapeHTML(item.mobileLabel||item.shortLabel)}</span>`;
+            label.title=`${item.name}${item.time?` · ${item.time} Uhr`:''}`;
+            cell.appendChild(label);
+          });
           grid.appendChild(cell);
         }
       }
@@ -947,6 +1157,7 @@
       const grid = $('yearGrid');
       grid.innerHTML = '';
       const holidayMap = new Map(holidays.map(item=>[item.key,item]));
+      const eventsByDay = getCalendarEventMap(year);
       for (let month=0;month<12;month++) {
         const monthHolidays = holidays.filter(item=>item.date.getMonth()===month);
         const card = document.createElement('article');
@@ -974,14 +1185,22 @@
           if (date.getMonth()!==month) { day.className='mini-day empty'; day.textContent='·'; }
           else {
             const holiday=holidayMap.get(dateKey(date));
+            const dayEvents=eventsByDay.get(dateKey(date)) || [];
             const classes=['mini-day'];
             if (date.getDay()===0 || date.getDay()===6) classes.push('weekend');
             if (sameDate(date,today)) classes.push('today');
             if (holiday) classes.push('holiday');
+            if (dayEvents.length) {
+              classes.push('has-event');
+              if (dayEvents.some(item=>item.type==='season' || item.type==='meteorological')) classes.push('has-season');
+              if (dayEvents.some(item=>item.type==='eclipse')) classes.push('has-eclipse');
+            }
             day.className=classes.join(' ');
             day.textContent=String(date.getDate());
-            if (holiday) day.title=`${formatLongDate(date)} · ${holiday.name}`;
-            else day.title=formatLongDate(date);
+            const titleParts=[];
+            if (holiday) titleParts.push(holiday.name);
+            dayEvents.forEach(item=>titleParts.push(`${item.name}${item.time?` · ${item.time} Uhr`:''}`));
+            day.title=titleParts.length?`${formatLongDate(date)} · ${titleParts.join(' · ')}`:formatLongDate(date);
           }
           mini.appendChild(day);
         }
@@ -1023,14 +1242,30 @@
       if (!holidays.length) list.innerHTML='<div class="empty-state">Für dieses Jahr wurden keine Feiertage berechnet.</div>';
     }
 
-    function showHolidayDetails(holiday) {
-      $('dialogTitle').textContent=holiday.name;
-      $('dialogDate').textContent=formatLongDate(holiday.date);
-      $('dialogDescription').textContent=`${holiday.rule} ${holiday.scopeDescription}`;
-      $('dialogMeta').innerHTML=`<span class="scope-pill ${getHolidayScopeClass(holiday)}">${holiday.scopeLabel}</span><span class="scope-pill">Gesetzlicher Feiertag</span>`;
+    function showDayDetails(date,holiday,events=[]) {
+      const state=getSelectedState();
+      const descriptions=[];
+      if (holiday) descriptions.push(`${holiday.name}\n${holiday.rule} ${holiday.scopeDescription}`);
+      events.forEach(item=>descriptions.push(`${item.name}${item.time?` · ${item.time} Uhr (Ortszeit)`:''}\n${item.description}`));
+      $('dialogTitle').textContent=holiday && events.length===0 ? holiday.name : holiday && events.length ? 'Feiertag und Himmelsereignisse' : events.length===1 ? events[0].name : 'Himmelsereignisse';
+      $('dialogEyebrow').textContent=holiday ? `Gesetzlicher Feiertag · ${state.name}` : 'Astronomisches Ereignis';
+      $('dialogDate').textContent=formatLongDate(date);
+      $('dialogDescription').textContent=descriptions.join('\n\n');
+      const badges=[];
+      if (holiday) badges.push(`<span class="scope-pill ${getHolidayScopeClass(holiday)}">${escapeHTML(holiday.scopeLabel)}</span><span class="scope-pill">Gesetzlicher Feiertag</span>`);
+      events.forEach(item=>badges.push(`<span class="scope-pill">${escapeHTML(item.categoryLabel)}</span>`));
+      $('dialogMeta').innerHTML=badges.join('');
+      $('dialogSourceText').textContent=events.some(item=>item.type==='eclipse')
+        ? 'Die Termine der in Deutschland sichtbaren Mondfinsternisse sind für 2027 bis 2036 fest hinterlegt. Es werden bewusst keine Uhrzeiten angezeigt. Mondphasen und Jahreszeiten werden davon unabhängig lokal berechnet.'
+        : events.length
+          ? 'Astronomische Ereignisse werden lokal berechnet. Mondphasen beruhen auf einer Meeus-Näherung; Jahreszeitenzeiten können um einige Minuten abweichen. Zeitangaben entsprechen der lokalen Zeitzone dieses Geräts.'
+          : `Rechtsgrundlage: Feiertagsrecht des Landes ${state.name}. Regionale Feiertage gelten nur an den jeweils genannten Orten.`;
       const dialog=$('holidayDialog');
       if (typeof dialog.showModal==='function') dialog.showModal();
       else dialog.setAttribute('open','');
+    }
+    function showHolidayDetails(holiday) {
+      showDayDetails(holiday.date,holiday,[]);
     }
     function closeHolidayDialog() {
       const dialog=$('holidayDialog');
@@ -1108,7 +1343,8 @@
       getHolidays: (year,stateCode=settings.federalState) => getHolidays(year,stateCode).map(item=>({name:item.name,shortName:item.shortName,date:new Date(item.date),scope:item.scope,scopeType:item.scopeType,scopeLabel:item.scopeLabel,regional:item.regional,key:item.key})),
       getHolidayCounts: (year,stateCode=settings.federalState) => getHolidayCounts(getHolidays(year,stateCode)),
       getISOWeek: date => getISOWeek(makeLocalDate(date.getFullYear(),date.getMonth(),date.getDate())),
-      getDateKey: date => dateKey(date)
+      getDateKey: date => dateKey(date),
+      getCalendarEvents: year => getCalendarEvents(year).map(item=>({type:item.type,name:item.name,shortLabel:item.shortLabel,date:new Date(item.date),time:item.time,categoryLabel:item.categoryLabel}))
     });
     window.KalenderFeiertage = calendarApi;
     // Kompatibilitätsalias für ältere Tests aus der ursprünglichen NRW-Version.
