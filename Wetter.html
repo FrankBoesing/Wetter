@@ -397,7 +397,7 @@
   <main class="shell">
     <header class="topbar">
       <div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42m-9.88 9.88-1.42 1.42"/><circle cx="12" cy="12" r="4"/></svg></span>Wetter</div>
-      <div class="top-actions"><span><i class="live-dot"></i><span class="live-label">LIVE-WETTERDATEN</span></span><a class="icon-btn nav-link" href="Kalender.html" title="Kalender öffnen" aria-label="Kalender öffnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 18h7"/></svg><span class="refresh-label">Kalender</span></a><button class="icon-btn" id="refreshBtn" title="Wetterdaten aktualisieren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.4-3"/></svg><span class="refresh-label">Aktualisieren</span></button><button class="icon-btn" id="setupToggleBtn" title="Orte verwalten" aria-label="Orte verwalten" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.7-1l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 0 2Z" transform="translate(-1 -1) scale(1.08)"/></svg><span class="refresh-label">Setup</span></button></div>
+      <div class="top-actions"><span><i class="live-dot"></i><span class="live-label">LIVE-WETTERDATEN</span></span><a class="icon-btn nav-link" href="Kalender.html" title="Kalender öffnen" aria-label="Kalender öffnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 18h7"/></svg><span class="refresh-label">Kalender</span></a><a class="icon-btn nav-link" id="trafficBtn" href="https://www.google.com/maps/@52.520000,13.405000,14.92z/data=!5m1!1e1" target="_blank" rel="noopener noreferrer" title="Verkehr auf Google Maps öffnen" aria-label="Verkehr auf Google Maps öffnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14l1-6-2-5H6l-2 5 1 6Z"/><path d="M7 17v2m10-2v2M4 11h16M7 14h.01M17 14h.01M8 6l-1 5m9-5 1 5"/></svg><span class="refresh-label">Verkehr</span></a><button class="icon-btn" id="refreshBtn" title="Wetterdaten aktualisieren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.4-3"/></svg><span class="refresh-label">Aktualisieren</span></button><button class="icon-btn" id="setupToggleBtn" title="Orte verwalten" aria-label="Orte verwalten" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.7-1l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 0 2Z" transform="translate(-1 -1) scale(1.08)"/></svg><span class="refresh-label">Setup</span></button></div>
     </header>
 
     <nav class="location-switcher" id="locationSwitcher" aria-label="Wetterort auswählen"></nav>
@@ -497,7 +497,8 @@
       </article>
       <article class="panel moon-panel">
         <div class="section-head"><div><h2 class="section-title">Mond & Mondphase</h2><div class="section-sub">Mondaufgang und Monduntergang in <span id="moonLocationName">Berlin</span></div></div></div>
-        <div class="moon-visual" role="img" aria-label="Aktuelle Mondposition über dem Horizont">          <div class="sun-track moon-track"></div><div class="sun-arc moon-arc"></div>
+        <div class="moon-visual" role="img" aria-label="Aktuelle Mondposition über dem Horizont">
+          <div class="sun-track moon-track"></div><div class="sun-arc moon-arc"></div>
           <div class="moon-now" id="moonNow">
             <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
               <circle class="moon-disc-shadow" cx="24" cy="24" r="20" />
@@ -806,9 +807,26 @@
     $('setupPanel').hidden = true;
     $('setupToggleBtn').setAttribute('aria-expanded','false');
   }
+  function updateTrafficLink(place) {
+    const link = $('trafficBtn');
+    const latitude = Number(place?.latitude);
+    const longitude = Number(place?.longitude);
+    if (!link) return;
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      link.removeAttribute('href');
+      link.setAttribute('aria-disabled', 'true');
+      return;
+    }
+    // Zoom 14.92 aus der vom Benutzer gelieferten Google-Maps-Ansicht.
+    // Die Koordinaten werden bei jedem Ortswechsel aus dem aktiven Wetterort übernommen.
+    link.href = `https://www.google.com/maps/@${latitude.toFixed(6)},${longitude.toFixed(6)},14.92z/data=!5m1!1e1`;
+    link.removeAttribute('aria-disabled');
+  }
+
   function updateLocationLabels(place) {
     set('locationTitle', place.name);
     set('locationMeta', placeMeta(place));
+    updateTrafficLink(place);
     set('sunLocationName', place.name);
     set('moonLocationName', place.name);
     set('footerLocationName', place.name);
@@ -979,8 +997,7 @@
     });
     const airParams = new URLSearchParams({
       latitude:place.latitude, longitude:place.longitude, timezone:'auto', forecast_days:'5',
-      hourly:'european_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide,uv_index,alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,ragweed_pollen'
-    });
+      hourly:'european_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide,uv_index,alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,ragweed_pollen'    });
     const results = await Promise.allSettled([
       fetchJson(`https://api.open-meteo.com/v1/forecast?${weatherParams}`),
       fetchJson(`https://air-quality-api.open-meteo.com/v1/air-quality?${airParams}`)
@@ -996,7 +1013,8 @@
   }
 
   async function loadWeather(forceRefresh = false) {
-    const requestId = ++loadSequence;    const place = locations[activeLocationIndex] || DEFAULT_LOCATIONS[0];
+    const requestId = ++loadSequence;
+    const place = locations[activeLocationIndex] || DEFAULT_LOCATIONS[0];
     const cacheKey = locationCacheKey(place);
     const btn = $('refreshBtn');
     btn.disabled = true;
@@ -1495,7 +1513,8 @@
       } else {
         $('warningTitle').textContent = 'Amtliche Warnmeldungen';
         warningSetStatus(`MoWaS-RSS-Meldungen für ${place.name} konnten nicht abgerufen werden. Das ist keine Aussage über Warnfreiheit. Ursache: ${error.message || 'Netzwerk-/CORS-Fehler'}. Bitte das offizielle Warnportal prüfen.`,'error');
-      }    }
+      }
+    }
   }
 
   // Beim Start werden ausschließlich RSS-Feeds mit bereits gespeicherter
