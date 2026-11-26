@@ -17,8 +17,16 @@ Die Wetterseite bietet:
 - Regionale amtliche MoWaS-Warnmeldungen.
 - Sonnenaufgang, Sonnenuntergang, Tageslänge sowie Mondphase, Beleuchtung und Mondauf/-untergang.
 - Einen Verkehrsbutton, der Google Maps mit aktivierter Verkehrsebene und dem aktuell ausgewählten Ort öffnet (Zoomstufe 14,92).
+- Einen Regenradar-Einstieg, der den aktiven Wetterort samt Koordinaten an `Regenradar.html` übergibt.
 
 **Hinweis:** Für aktuelle Wetter-, Luftqualitäts- und Warnmeldungsdaten sowie Google Maps ist eine Internetverbindung erforderlich.
+
+## Regenradar
+
+- Interaktive Einbettung des NIERAD-Regenradars ohne API-Key oder Benutzerkonto.
+- Beim Aufruf aus der Wetterseite werden Name und Koordinaten des ausgewählten Ortes übergeben.
+- Ohne gültige Ortskoordinaten in der URL wird die Gesamtansicht Deutschland angezeigt.
+- Die Radar-Seite selbst verarbeitet keine Wetterdaten; Karte, Zeitleiste und kurzfristige Prognose kommen von NIERAD.
 
 ## Kalender
 
@@ -42,6 +50,7 @@ Es gibt keine Terminverwaltung, Ereigniserstellung oder Erinnerungsfunktion.
 | `index.html` | Leitet auf die Wetterseite weiter |
 | `Wetter.html` | Wetterübersicht |
 | `Kalender.html` | Feiertags- und Ereigniskalender |
+| `Regenradar.html` | Eingebettetes NIERAD-Regenradar; übernimmt den Wetterort über URL-Parameter oder zeigt Deutschland |
 | `README.md` | Projektbeschreibung und Links |
 
 ## Betrieb
