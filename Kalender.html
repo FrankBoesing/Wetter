@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="Offline-Kalender mit allen gesetzlichen Feiertagen in Nordrhein-Westfalen." />
+  <title>Kalender · NRW</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #08111f;
+      --bg2: #0d1a2c;
+      --panel: rgba(17, 31, 50, .78);
+      --panel-strong: rgba(20, 37, 59, .94);
+      --line: rgba(164, 190, 220, .13);
+      --muted: #8ea3bd;
+      --soft: #b6c5d8;
+      --text: #edf5ff;
+      --cyan: #69dded;
+      --blue: #75aaff;
+      --violet: #a88bff;
+      --orange: #ffbd75;
+      --green: #74dfb0;
+      --red: #ff8f9b;
+      --shadow: 0 24px 70px rgba(0,0,0,.25);
+      --radius: 22px;
+      --holiday-color: #69dded;
+      --holiday-text: #bff5fb;
+      --holiday-font: 10.5px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 12% 0%, rgba(41, 126, 172, .20), transparent 36rem),
+        radial-gradient(ellipse at 88% 10%, rgba(112, 88, 183, .17), transparent 34rem),
+        linear-gradient(160deg, #07101d 0%, #0b1728 52%, #0a1422 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-feature-settings: "ss01" on;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .14;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light; z-index: -1;
+    }
+    button, select, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, select:focus-visible, input:focus-visible {
+      outline: 2px solid rgba(105,221,237,.8); outline-offset: 3px;
+    }
+    .shell { width: min(1460px, calc(100% - 44px)); margin: 0 auto; padding: 26px 0 52px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:25px; }
+    .brand { display:flex; align-items:center; gap:12px; font-size:14px; letter-spacing:.19em; font-weight:800; color:#d7e7f9; white-space:nowrap; }
+    .brand-mark { width:35px; height:35px; border-radius:12px; display:grid; place-items:center; background:linear-gradient(145deg, rgba(105,221,237,.25), rgba(117,170,255,.15)); border:1px solid rgba(105,221,237,.26); box-shadow:0 6px 22px rgba(44,177,203,.12); }
+    .brand-mark svg { width:20px; height:20px; stroke:var(--cyan); }
+    .top-actions { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; }
+    .icon-btn { display:flex; align-items:center; justify-content:center; gap:9px; border:1px solid var(--line); border-radius:12px; color:var(--soft); background:rgba(17,31,50,.65); padding:10px 13px; min-height:42px; cursor:pointer; transition:.2s; text-decoration:none; white-space:nowrap; }
+    .icon-btn:hover { border-color:rgba(105,221,237,.42); color:white; transform:translateY(-1px); }
+    .icon-btn svg { width:15px; height:15px; flex:0 0 auto; }
+    .icon-btn.primary { border-color:rgba(105,221,237,.36); color:#eafaff; background:rgba(55,160,184,.20); }
+    .icon-btn.primary:hover { background:rgba(55,160,184,.32); }
+    .setup-panel { padding:21px; margin:0 0 18px; }
+    .setup-panel[hidden] { display:none; }
+    .setup-intro { color:var(--muted); font-size:12px; line-height:1.55; margin:-5px 0 16px; }
+    .setup-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px 18px; }
+    .setup-field { display:flex; flex-direction:column; gap:8px; color:#a9bfd6; font-size:12px; min-width:0; }
+    .setup-field select, .setup-field input[type="color"], .setup-field input[type="range"] {
+      width:100%; min-width:0; border:1px solid rgba(164,190,220,.18); border-radius:11px; outline:none; color:var(--text); background:rgba(6,17,31,.66); padding:10px 12px; min-height:42px;
+    }
+    .setup-field select { cursor:pointer; }
+    .setup-field input[type="color"] { padding:5px; cursor:pointer; }
+    .range-line { display:flex; align-items:center; gap:12px; }
+    .range-line input { flex:1; padding:0!important; accent-color:var(--cyan); }
+    .range-value { color:#dceafa; min-width:42px; text-align:right; font-variant-numeric:tabular-nums; }
+    .check-line { display:flex; align-items:center; gap:10px; min-height:42px; color:#c2d1e2; }
+    .check-line input { width:17px; height:17px; accent-color:var(--cyan); }
+    .setup-actions { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:18px; }
+    .setup-feedback { color:#8ea3bd; font-size:11px; line-height:1.5; }
+    .setup-buttons { display:flex; gap:9px; flex-wrap:wrap; justify-content:flex-end; }
+    .setup-save, .setup-cancel { border:1px solid var(--line); border-radius:11px; color:var(--soft); background:rgba(17,31,50,.65); padding:10px 14px; min-height:42px; cursor:pointer; transition:.2s; }
+    .setup-save { border-color:rgba(105,221,237,.36); color:#eafaff; background:rgba(55,160,184,.20); }
+    .setup-save:hover { background:rgba(55,160,184,.32); }
+    .setup-cancel:hover { border-color:rgba(105,221,237,.35); color:white; }
+    .hero { position:relative; overflow:hidden; border:1px solid rgba(134,187,224,.19); border-radius:30px; padding:clamp(24px,3.5vw,40px); min-height:182px; background:linear-gradient(115deg, rgba(24,53,78,.94), rgba(23,43,70,.83) 55%, rgba(40,46,85,.77)); box-shadow:var(--shadow); margin-bottom:22px; }
+    .hero::before { content:""; position:absolute; width:440px; height:440px; right:7%; top:-245px; border-radius:50%; background:radial-gradient(circle, rgba(105,221,237,.22), rgba(105,221,237,0) 68%); pointer-events:none; }
+    .hero::after { content:""; position:absolute; width:300px; height:300px; right:14%; bottom:-250px; border-radius:50%; border:1px solid rgba(143,202,235,.12); box-shadow:0 0 0 28px rgba(143,202,235,.025),0 0 0 58px rgba(143,202,235,.02),0 0 0 90px rgba(143,202,235,.015); pointer-events:none; }
+    .hero-content { position:relative; z-index:1; display:flex; justify-content:space-between; align-items:flex-end; gap:25px; }
+    .eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.16em; font-weight:750; font-size:11px; }
+    h1 { font-size:clamp(32px,4vw,49px); letter-spacing:-.045em; line-height:1.05; margin:12px 0 9px; font-weight:760; }
+    .location-line { display:flex; align-items:center; gap:8px; color:#a9bfd6; font-size:14px; }
+    .location-line svg { width:15px; height:15px; color:var(--cyan); flex:0 0 auto; }
+    .hero-meta { text-align:right; color:#bfd0e3; font-size:13px; line-height:1.65; padding-bottom:4px; }
+    .hero-meta strong { display:block; color:#eff6ff; font-size:19px; font-weight:680; }
+    .section { margin-top:25px; }
+    .section-head { display:flex; align-items:end; justify-content:space-between; gap:18px; margin-bottom:14px; }
+    .section-title { font-size:17px; letter-spacing:-.02em; font-weight:720; margin:0; }
+    .section-sub { color:var(--muted); font-size:12px; margin-top:5px; line-height:1.45; }
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 12px 35px rgba(0,0,0,.11); backdrop-filter:blur(18px); }
+    .view-switcher { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 15px; }
+    .view-tab { border:1px solid var(--line); border-radius:12px; color:#aebfd3; background:rgba(17,31,50,.58); padding:10px 16px; min-height:42px; cursor:pointer; transition:.2s; }
+    .view-tab:hover { border-color:rgba(105,221,237,.42); color:white; }
+    .view-tab.active { color:#eafaff; border-color:rgba(105,221,237,.50); background:rgba(105,221,237,.12); box-shadow:inset 0 0 0 1px rgba(105,221,237,.08); }
+    .today-tab { display:flex; align-items:center; justify-content:center; gap:7px; }
+    .today-tab:hover { border-color:rgba(105,221,237,.42); color:white; }
+    .today-tab svg { width:15px; height:15px; flex:0 0 auto; }
+    .content-layout { display:grid; grid-template-columns:minmax(0,1.58fr) minmax(285px,.72fr); gap:15px; align-items:start; }
+    .view-panel { min-width:0; padding:20px; }
+    .view-toolbar { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:17px; }
+    .view-heading { min-width:0; }
+    .view-heading h2 { margin:0; font-size:clamp(21px,2.5vw,28px); font-weight:730; letter-spacing:-.035em; }
+    .view-heading p { margin:5px 0 0; color:var(--muted); font-size:11px; line-height:1.4; }
+    .nav-group { display:flex; align-items:center; gap:7px; flex:0 0 auto; }
+    .nav-btn { width:41px; height:41px; display:grid; place-items:center; border:1px solid var(--line); border-radius:12px; color:var(--soft); background:rgba(17,31,50,.65); cursor:pointer; transition:.2s; }
+    .nav-btn:hover { border-color:rgba(105,221,237,.42); color:white; transform:translateY(-1px); }
+    .nav-btn svg { width:17px; height:17px; }
+    .year-nav-btn { width:auto; padding:0 13px; display:flex; gap:7px; font-size:12px; }
+    [hidden] { display:none!important; }
+
+    .calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:7px; }
+    .calendar-grid.with-weeks { grid-template-columns:38px repeat(7,minmax(0,1fr)); }
+    .weekday-head { text-align:center; padding:8px 2px 10px; color:#92a9c3; font-size:11px; font-weight:750; letter-spacing:.035em; text-transform:uppercase; }
+    .weekday-head.week-label { color:#6f87a2; font-size:9px; }
+    .week-number { display:flex; justify-content:center; align-items:flex-start; padding-top:13px; color:#7189a5; font-size:10px; font-variant-numeric:tabular-nums; }
+    .day-cell { position:relative; display:flex; flex-direction:column; align-items:stretch; text-align:left; min-width:0; min-height:104px; padding:9px 8px 8px; border:1px solid rgba(164,190,220,.075); border-radius:14px; background:rgba(118,155,194,.045); color:var(--text); overflow:hidden; }
+    button.day-cell { cursor:pointer; transition:background .18s,border-color .18s,transform .18s; }
+    button.day-cell:hover { border-color:rgba(105,221,237,.42); transform:translateY(-1px); }
+    /* Wochenendtage heben sich leicht bläulich von Werktagen ab. Heute- und Feiertagsfarben bleiben vorrangig. */
+    .day-cell.weekend { background:rgba(117,170,255,.095); border-color:rgba(117,170,255,.16); }
+    .day-cell.weekend:not(.today):not(.holiday) .day-number { color:#c8d9ec; }
+    .day-cell.outside-month { opacity:.37; background:rgba(118,155,194,.025); }
+    .day-cell.today { border-color:rgba(105,221,237,.58); background:linear-gradient(180deg,rgba(105,221,237,.13),rgba(17,31,50,.76)); box-shadow:inset 0 0 0 1px rgba(105,221,237,.12); }
+    .day-cell.holiday { border-color:color-mix(in srgb,var(--holiday-color) 38%,transparent); background:color-mix(in srgb,var(--holiday-color) 11%,rgba(17,31,50,.88)); }
+    .day-cell.holiday.weekend { background:color-mix(in srgb,var(--holiday-color) 15%,rgba(17,31,50,.88)); }
+    .day-cell.holiday.today { border:2px solid var(--cyan); background:linear-gradient(145deg,color-mix(in srgb,var(--holiday-color) 18%,rgba(17,31,50,.88)),rgba(30,67,87,.82)); box-shadow:0 0 0 2px rgba(105,221,237,.13),inset 0 0 0 1px rgba(105,221,237,.13); }
+    .day-number { align-self:flex-start; display:inline-flex; align-items:center; justify-content:center; min-width:25px; height:25px; padding:0 6px; border-radius:8px; color:#e5effb; font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; }
+    .day-cell.today .day-number { color:#071923; background:var(--cyan); }
+    .day-cell.holiday:not(.today) .day-number { color:var(--holiday-text); }
+    .holiday-label { display:block; margin-top:7px; color:var(--holiday-text); font-size:var(--holiday-font); line-height:1.2; font-weight:650; overflow-wrap:anywhere; hyphens:auto; }
+    .holiday-symbol { display:inline-block; color:var(--holiday-color); margin-right:3px; font-size:9px; line-height:1.2; }
+    .holiday-label-text { display:inline; }
+    .scope-mini { align-self:flex-start; display:inline-flex; margin:5px 0 0 12px; padding:2px 5px; border-radius:5px; background:rgba(117,170,255,.12); color:#b7d0ff; font-size:8px; line-height:1.2; letter-spacing:.04em; font-weight:800; }
+    .calendar-legend { display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin-top:17px; padding-top:14px; border-top:1px solid rgba(164,190,220,.10); color:#91a7c0; font-size:10px; }
+    .legend-item { display:inline-flex; align-items:center; gap:7px; }
+    .legend-swatch { display:inline-block; width:11px; height:11px; border-radius:4px; border:1px solid rgba(164,190,220,.2); background:rgba(118,155,194,.08); }
+    .legend-swatch.today { border:2px solid var(--cyan); background:rgba(105,221,237,.13); }
+    .legend-swatch.holiday { border-color:color-mix(in srgb,var(--holiday-color) 55%,transparent); background:color-mix(in srgb,var(--holiday-color) 22%,transparent); }
+    .legend-swatch.weekend { background:rgba(118,155,194,.15); }
+
+    .sidebar { display:grid; gap:13px; }
+    .next-card { position:relative; overflow:hidden; padding:20px; background:linear-gradient(145deg,rgba(25,65,83,.90),rgba(21,43,68,.90) 65%,rgba(38,43,79,.88)); border-color:rgba(105,221,237,.19); }
+    .next-card::after { content:""; position:absolute; width:185px; height:185px; right:-80px; top:-90px; border-radius:50%; background:radial-gradient(circle,rgba(105,221,237,.18),transparent 70%); pointer-events:none; }
+    .card-eyebrow { position:relative; z-index:1; color:var(--cyan); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.13em; }
+    .next-date { position:relative; z-index:1; color:#c0d2e5; font-size:12px; margin-top:16px; }
+    .next-name { position:relative; z-index:1; font-size:22px; line-height:1.18; letter-spacing:-.035em; font-weight:740; margin-top:5px; overflow-wrap:anywhere; }
+    .next-countdown { position:relative; z-index:1; display:inline-flex; margin-top:14px; padding:6px 10px; border-radius:999px; color:#c6f5fa; border:1px solid rgba(105,221,237,.22); background:rgba(105,221,237,.10); font-size:10px; font-weight:700; }
+    .side-card { padding:18px 19px; }
+    .side-card h3 { margin:0; font-size:14px; font-weight:720; }
+    .side-card p { color:var(--muted); font-size:11px; line-height:1.55; margin:8px 0 0; }
+    .stat-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid rgba(164,190,220,.08); color:#9db0c7; font-size:11px; }
+    .stat-row:last-child { border-bottom:0; padding-bottom:0; }
+    .stat-row strong { color:#edf5ff; font-size:16px; font-weight:720; font-variant-numeric:tabular-nums; }
+    .side-legend { display:grid; gap:10px; margin-top:13px; }
+    .side-legend .legend-item { color:#a5b8ce; font-size:11px; }
+    .scope-pill { display:inline-flex; align-items:center; padding:3px 7px; border-radius:7px; font-size:9px; font-weight:800; letter-spacing:.04em; color:#c7d9ef; background:rgba(117,170,255,.12); border:1px solid rgba(117,170,255,.17); white-space:nowrap; }
+    .scope-pill.nrw { color:#d0c4ff; background:rgba(168,139,255,.13); border-color:rgba(168,139,255,.2); }
+
+    .year-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .year-month { min-width:0; padding:14px; background:rgba(118,155,194,.045); border:1px solid rgba(164,190,220,.09); border-radius:16px; transition:border-color .2s,background .2s; }
+    .year-month:hover { border-color:rgba(105,221,237,.28); background:rgba(118,155,194,.07); }
+    .year-month-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+    .month-open { border:0; padding:0; color:#e4eefb; background:transparent; font-size:14px; font-weight:750; cursor:pointer; text-align:left; }
+    .month-open:hover { color:var(--cyan); }
+    .month-holiday-count { color:#8ca4bf; font-size:10px; white-space:nowrap; }
+    .mini-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:3px; text-align:center; }
+    .mini-weekday { color:#768da8; font-size:9px; font-weight:750; padding:3px 0 5px; }
+    .mini-day { display:flex; justify-content:center; align-items:center; min-width:0; aspect-ratio:1; border-radius:6px; color:#b7c6d8; font-size:10px; font-variant-numeric:tabular-nums; }
+    .mini-day.empty { visibility:hidden; }
+    .mini-day.weekend { color:#8299b4; }
+    .mini-day.today { outline:1px solid var(--cyan); color:#eaffff; background:rgba(105,221,237,.12); }
+    .mini-day.holiday { color:var(--holiday-text); background:color-mix(in srgb,var(--holiday-color) 20%,transparent); border:1px solid color-mix(in srgb,var(--holiday-color) 38%,transparent); font-weight:800; }
+    .mini-day.today.holiday { outline:2px solid var(--cyan); }
+    .month-holidays { display:grid; gap:4px; margin:10px 0 0; padding:9px 0 0; border-top:1px solid rgba(164,190,220,.08); list-style:none; }
+    .month-holidays li { color:#a9bdd3; font-size:10px; line-height:1.35; overflow-wrap:anywhere; }
+    .month-holidays strong { color:#d8ebf8; font-weight:750; font-variant-numeric:tabular-nums; margin-right:5px; }
+    .year-note { color:#8199b4; font-size:10px; line-height:1.5; margin:14px 2px 0; }
+
+    .holiday-list { display:grid; gap:9px; }
+    .holiday-row { display:grid; grid-template-columns:72px minmax(0,1fr) auto; align-items:center; gap:14px; padding:13px 15px; border:1px solid rgba(164,190,220,.09); border-radius:14px; background:rgba(118,155,194,.045); transition:border-color .2s,background .2s; }
+    .holiday-row:hover { border-color:rgba(105,221,237,.25); background:rgba(118,155,194,.07); }
+    .holiday-datebox { padding:8px 6px; text-align:center; border-radius:10px; background:rgba(105,221,237,.09); border:1px solid rgba(105,221,237,.14); }
+    .holiday-datebox strong { display:block; color:#e7fbff; font-size:20px; line-height:1.0; font-weight:750; font-variant-numeric:tabular-nums; }
+    .holiday-datebox span { display:block; color:#8cb4c5; font-size:9px; text-transform:uppercase; margin-top:4px; letter-spacing:.08em; }
+    .holiday-row-main { min-width:0; }
+    .holiday-row-title { color:#edf5ff; font-size:14px; font-weight:700; line-height:1.3; }
+    .holiday-row-sub { color:#8ea3bd; font-size:10px; margin-top:4px; line-height:1.35; }
+    .holiday-row-action { border:1px solid rgba(105,221,237,.18); border-radius:9px; padding:7px 9px; color:#b9dce7; background:rgba(105,221,237,.07); font-size:10px; cursor:pointer; white-space:nowrap; }
+    .holiday-row-action:hover { border-color:rgba(105,221,237,.45); color:white; }
+    .empty-state { padding:25px 15px; text-align:center; color:var(--muted); font-size:12px; }
+
+    .footer { margin-top:30px; padding-top:16px; border-top:1px solid rgba(164,190,220,.10); display:flex; justify-content:space-between; gap:15px; color:#7088a4; font-size:10px; line-height:1.6; }
+    .footer strong { color:#9eb6d0; font-weight:650; }
+    dialog { width:min(460px,calc(100% - 28px)); padding:0; border:1px solid rgba(134,187,224,.23); border-radius:22px; color:var(--text); background:linear-gradient(145deg,rgba(23,43,66,.99),rgba(12,25,42,.99)); box-shadow:0 28px 90px rgba(0,0,0,.5); }
+    dialog::backdrop { background:rgba(2,8,16,.72); backdrop-filter:blur(5px); }
+    .dialog-inner { padding:23px; }
+    .dialog-top { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+    .dialog-eyebrow { color:var(--cyan); font-size:10px; text-transform:uppercase; letter-spacing:.13em; font-weight:800; }
+    .dialog-title { margin:8px 0 0; font-size:24px; line-height:1.15; letter-spacing:-.035em; }
+    .dialog-close { width:34px; height:34px; flex:0 0 auto; display:grid; place-items:center; border:1px solid var(--line); border-radius:10px; color:var(--soft); background:rgba(17,31,50,.65); cursor:pointer; }
+    .dialog-date { color:#b5c9df; font-size:13px; margin-top:15px; }
+    .dialog-description { color:#aebfd2; font-size:12px; line-height:1.65; margin-top:15px; }
+    .dialog-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px solid rgba(164,190,220,.10); }
+    .dialog-source { color:#748ca7; font-size:10px; margin-top:13px; line-height:1.5; }
+    .dialog-footer { display:flex; justify-content:flex-end; margin-top:19px; }
+    .dialog-footer button { border:1px solid rgba(105,221,237,.32); border-radius:11px; color:#eafaff; background:rgba(55,160,184,.20); padding:10px 15px; min-height:40px; cursor:pointer; }
+
+    @media (max-width:1100px) {
+      .content-layout { grid-template-columns:minmax(0,1.35fr) minmax(260px,.75fr); }
+      .year-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .day-cell { min-height:94px; padding:8px 6px; }
+      .holiday-label { font-size:calc(var(--holiday-font) - 1px); }
+    }
+    @media (max-width:820px) {
+      .content-layout { grid-template-columns:1fr; }
+      .sidebar { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .next-card { grid-row:span 2; }
+      .year-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    }
+    @media (max-width:700px) {
+      body { background:linear-gradient(180deg,#091625 0%,#0b1728 55%,#081321 100%); }
+      .shell { width:calc(100% - 20px); max-width:600px; padding:8px 0 30px; }
+      .topbar { position:sticky; top:0; z-index:30; margin:0 -10px 12px; padding:10px 10px 9px; background:rgba(8,17,31,.94); backdrop-filter:blur(16px); border-bottom:1px solid rgba(164,190,220,.10); }
+      .brand { gap:8px; letter-spacing:.12em; font-size:12px; }
+      .brand-mark { width:31px; height:31px; border-radius:10px; }
+      .top-actions { gap:7px; }
+      .icon-btn { min-width:42px; min-height:42px; padding:8px 10px; border-radius:13px; }
+      .icon-btn svg { width:17px; height:17px; }
+      .icon-btn .btn-label { display:none; }
+      .setup-panel { padding:15px; border-radius:18px; }
+      .setup-grid { grid-template-columns:1fr; gap:11px; }
+      .setup-field { font-size:12px; }
+      .setup-field select { min-height:46px; font-size:16px; }
+      .setup-actions { align-items:stretch; flex-direction:column; gap:12px; }
+      .setup-buttons { justify-content:flex-end; }
+      .setup-buttons button { min-height:43px; }
+      .hero { padding:20px 17px; border-radius:23px; min-height:0; margin-bottom:16px; background:linear-gradient(145deg,rgba(24,57,82,.98),rgba(23,43,70,.92) 65%,rgba(40,46,85,.88)); }
+      .hero-content { align-items:flex-start; flex-direction:column; gap:10px; }
+      .eyebrow { font-size:10px; letter-spacing:.14em; }
+      h1 { margin:8px 0 5px; font-size:30px; }
+      .location-line { font-size:12px; }
+      .hero-meta { text-align:left; font-size:11px; line-height:1.45; }
+      .hero-meta strong { display:inline; font-size:14px; margin-right:6px; }
+      .section { margin-top:19px; }
+      .view-switcher { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-bottom:10px; }
+      .view-tab { min-width:0; min-height:42px; padding:9px 4px; border-radius:11px; font-size:11px; }
+      .today-tab { gap:4px; }
+      .today-tab svg { width:13px; height:13px; }
+      .weather-link { padding-left:11px; padding-right:11px; }
+      .weather-link .btn-label { display:inline; }
+      .content-layout { gap:10px; }
+      .view-panel { padding:13px 10px 12px; border-radius:18px; }
+      .view-toolbar { align-items:center; gap:8px; margin:0 2px 11px; }
+      .view-heading h2 { font-size:21px; }
+      .view-heading p { font-size:10px; margin-top:4px; }
+      .nav-group { gap:5px; }
+      .nav-btn { width:38px; height:38px; border-radius:11px; }
+      .year-nav-btn { width:auto; padding:0 8px; gap:4px; font-size:10px; }
+      .calendar-grid { gap:3px; }
+      .calendar-grid.with-weeks { grid-template-columns:22px repeat(7,minmax(0,1fr)); }
+      .weekday-head { padding:6px 0 7px; font-size:9px; letter-spacing:0; }
+      .weekday-head.week-label { font-size:8px; }
+      .week-number { padding-top:10px; font-size:8px; }
+      .day-cell { min-height:78px; padding:5px 3px 5px; border-radius:9px; }
+      .day-number { min-width:20px; height:21px; padding:0 4px; border-radius:7px; font-size:10px; }
+      .holiday-label { margin-top:5px; font-size:calc(var(--holiday-font) - 2.5px); line-height:1.13; font-weight:650; }
+      .holiday-symbol { margin-right:2px; font-size:7px; }
+      .scope-mini { margin:4px 0 0 7px; padding:1px 3px; font-size:7px; }
+      .calendar-legend { gap:8px 12px; margin-top:12px; padding-top:11px; font-size:9px; }
+      .legend-swatch { width:10px; height:10px; }
+      .sidebar { grid-template-columns:1fr 1fr; gap:8px; }
+      .next-card { grid-column:1/-1; grid-row:auto; padding:16px; }
+      .next-date { margin-top:10px; font-size:11px; }
+      .next-name { font-size:20px; margin-top:4px; }
+      .next-countdown { margin-top:10px; }
+      .side-card { padding:13px; border-radius:16px; }
+      .side-card h3 { font-size:12px; }
+      .side-card p { font-size:10px; }
+      .stat-row { padding:8px 0; font-size:10px; }
+      .stat-row strong { font-size:14px; }
+      .side-legend { gap:8px; }
+      .side-legend .legend-item { font-size:9px; gap:5px; }
+      .year-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+      .year-month { padding:10px 8px; border-radius:13px; }
+      .year-month-head { margin-bottom:7px; }
+      .month-open { font-size:13px; }
+      .month-holiday-count { font-size:9px; }
+      .mini-grid { gap:2px; }
+      .mini-weekday { font-size:8px; padding:2px 0 4px; }
+      .mini-day { border-radius:4px; font-size:9px; }
+      .month-holidays { gap:3px; margin-top:7px; padding-top:7px; }
+      .month-holidays li { font-size:9px; }
+      .year-note { font-size:9px; margin-top:10px; }
+      .holiday-list { gap:7px; }
+      .holiday-row { grid-template-columns:55px minmax(0,1fr); gap:10px; padding:10px; border-radius:12px; }
+      .holiday-datebox { padding:7px 4px; }
+      .holiday-datebox strong { font-size:18px; }
+      .holiday-datebox span { font-size:8px; }
+      .holiday-row-title { font-size:12px; }
+      .holiday-row-sub { font-size:9px; }
+      .holiday-row-action { grid-column:2; justify-self:start; padding:6px 8px; font-size:9px; }
+      .footer { flex-direction:column; margin-top:22px; padding:13px 2px 0; font-size:9px; }
+    }
+    @media (max-width:370px) {
+      .shell { width:calc(100% - 16px); }
+      .topbar { margin-left:-8px; margin-right:-8px; padding-left:8px; padding-right:8px; }
+      .top-actions { gap:5px; }
+      .icon-btn { min-width:39px; padding:7px; }
+      .day-cell { min-height:73px; padding:4px 2px; }
+      .day-number { min-width:18px; height:19px; font-size:9px; }
+      .holiday-label { font-size:calc(var(--holiday-font) - 3.5px); }
+      .calendar-grid.with-weeks { grid-template-columns:16px repeat(7,minmax(0,1fr)); }
+      .year-month { padding:9px 6px; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *,*::before,*::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3.5" y="5" width="17" height="16" rx="2.7"/><path d="M7.5 3v4M16.5 3v4M3.5 9.5h17M8 13h2m4 0h2M8 17h2"/>
+          </svg>
+        </span>
+        Kalender
+      </div>
+      <div class="top-actions" aria-label="Schnellaktionen">
+        <a class="icon-btn weather-link" id="weatherLink" href="./Wetter.html" title="Wetterseite öffnen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 8.5 4.8 4.8 0 0 0 7 18Z"/><path d="m9 21 1-1m4 1 1-1"/></svg><span class="btn-label">Wetter</span>
+        </a>
+        <button class="icon-btn" id="settingsToggleBtn" type="button" title="Einstellungen öffnen" aria-label="Einstellungen öffnen" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.7-1l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 0 2Z" transform="translate(-1 -1) scale(1.08)"/></svg><span class="btn-label">Setup</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="panel setup-panel" id="setupPanel" hidden aria-labelledby="setupTitle">
+      <div class="section-head">
+        <div><h2 class="section-title" id="setupTitle">Kalender-Einstellungen</h2><div class="section-sub">Darstellung anpassen · Bundesland: Nordrhein-Westfalen</div></div>
+      </div>
+      <p class="setup-intro">Hier werden ausschließlich Anzeigeoptionen festgelegt. Termine, Ereignisse oder Erinnerungen werden nicht verwaltet. Einstellungen werden lokal in diesem Browser gespeichert, sofern localStorage verfügbar ist.</p>
+      <div class="setup-grid">
+        <label class="setup-field" for="defaultView">Standardansicht
+          <select id="defaultView"><option value="month">Monatsansicht</option><option value="year">Jahresübersicht</option><option value="holidays">Feiertagsliste</option></select>
+        </label>
+        <label class="setup-field" for="firstDay">Erster Wochentag
+          <select id="firstDay"><option value="1">Montag</option><option value="0">Sonntag</option></select>
+        </label>
+        <div class="setup-field">Kalenderwochen
+          <label class="check-line"><input type="checkbox" id="showWeeks" /> ISO-Kalenderwochen anzeigen</label>
+        </div>
+        <label class="setup-field" for="holidayColor">Feiertagsfarbe
+          <input type="color" id="holidayColor" value="#69dded" />
+        </label>
+        <label class="setup-field" for="holidayTextColor">Textfarbe der Feiertage
+          <input type="color" id="holidayTextColor" value="#bff5fb" />
+        </label>
+        <label class="setup-field" for="holidayFontSize">Schriftgröße der Feiertagsnamen
+          <span class="range-line"><input type="range" id="holidayFontSize" min="8" max="14" step="0.5" /><span class="range-value" id="holidayFontValue">10,5 px</span></span>
+        </label>
+      </div>
+      <div class="setup-actions">
+        <div class="setup-feedback" id="setupFeedback" role="status" aria-live="polite">Änderungen werden erst nach dem Übernehmen aktiv.</div>
+        <div class="setup-buttons"><button class="setup-cancel" id="resetSettingsBtn" type="button">Standardwerte</button><button class="setup-cancel" id="closeSettingsBtn" type="button">Schließen</button><button class="setup-save" id="saveSettingsBtn" type="button">Übernehmen</button></div>
+      </div>
+    </section>
+
+    <section class="hero" aria-label="Kalender für Nordrhein-Westfalen">
+      <div class="hero-content">
+        <div>
+          <div class="eyebrow">Dein Kalender auf einen Blick</div>
+          <h1>Kalender</h1>
+          <div class="location-line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Nordrhein-Westfalen · Deutschland</span></div>
+        </div>
+        <div class="hero-meta"><strong id="heroTodayDate">--</strong><span id="heroTodayWeekday">--</span><br><span>Alle 11 gesetzlichen Feiertage · vollständig offline</span></div>
+      </div>
+    </section>
+
+    <nav class="view-switcher" aria-label="Kalendernavigation">
+      <button class="view-tab today-tab" id="todayBtn" type="button" title="Zum heutigen Datum">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Heute</span>
+      </button>
+      <button class="view-tab active" type="button" data-view="month" aria-pressed="true">Monat</button>
+      <button class="view-tab" type="button" data-view="year" aria-pressed="false">Jahr</button>
+      <button class="view-tab" type="button" data-view="holidays" aria-pressed="false">Feiertage</button>
+    </nav>
+
+    <div class="content-layout">
+      <section class="panel view-panel" aria-live="polite">
+        <div class="view-toolbar">
+          <div class="view-heading"><h2 id="viewTitle">Monat</h2><p id="viewSubtitle">Wochen beginnen am Montag · ISO-Kalenderwochen</p></div>
+          <div class="nav-group" id="monthNav" aria-label="Monat wechseln">
+            <button class="nav-btn" id="prevMonthBtn" type="button" title="Vorheriger Monat" aria-label="Vorheriger Monat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+            <button class="nav-btn" id="nextMonthBtn" type="button" title="Nächster Monat" aria-label="Nächster Monat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+          </div>
+          <div class="nav-group" id="yearNav" hidden aria-label="Jahr wechseln">
+            <button class="nav-btn year-nav-btn" id="prevYearBtn" type="button" title="Vorheriges Jahr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg><span>Jahr</span></button>
+            <button class="nav-btn year-nav-btn" id="nextYearBtn" type="button" title="Nächstes Jahr"><span>Jahr</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+          </div>
+        </div>
+
+        <div id="monthView">
+          <div class="calendar-grid" id="monthGrid" aria-label="Monatskalender"></div>
+          <div class="calendar-legend" aria-label="Kalenderlegende">
+            <span class="legend-item"><i class="legend-swatch today"></i>Heute</span>
+            <span class="legend-item"><i class="legend-swatch holiday"></i>Gesetzlicher Feiertag</span>
+            <span class="legend-item"><i class="legend-swatch weekend"></i>Wochenende</span>
+            <span class="legend-item"><span style="color:var(--holiday-color);font-weight:900">✦</span> Feiertagsdetails per Klick</span>
+          </div>
+        </div>
+
+        <div id="yearView" hidden>
+          <div class="year-grid" id="yearGrid" aria-label="Jahresübersicht"></div>
+          <p class="year-note">Feiertage sind farblich markiert und unter dem jeweiligen Monat mit Datum und Kurzbezeichnung aufgeführt. Ein Klick auf einen Monatsnamen öffnet dessen Monatsansicht.</p>
+        </div>
+
+        <div id="holidaysView" hidden>
+          <div class="holiday-list" id="holidayList" aria-label="Gesetzliche Feiertage"></div>
+        </div>
+      </section>
+
+      <aside class="sidebar" aria-label="Feiertagsinformationen">
+        <article class="panel next-card">
+          <div class="card-eyebrow">Nächster Feiertag</div>
+          <div class="next-date" id="nextHolidayDate">--</div>
+          <div class="next-name" id="nextHolidayName">Wird berechnet …</div>
+          <div class="next-countdown" id="nextHolidayCountdown">--</div>
+        </article>
+        <article class="panel side-card">
+          <h3>Feiertage in NRW</h3>
+          <div class="stat-row"><span>Gesetzliche Feiertage</span><strong>11</strong></div>
+          <div class="stat-row"><span>Bundesweit</span><strong>9</strong></div>
+          <div class="stat-row"><span>Zusätzlich in NRW</span><strong>2</strong></div>
+          <p>Die Berechnung erfolgt jedes Jahr neu anhand des gregorianischen Osterdatums.</p>
+        </article>
+        <article class="panel side-card">
+          <h3>Legende</h3>
+          <div class="side-legend">
+            <span class="legend-item"><i class="legend-swatch today"></i>Heutiger Tag</span>
+            <span class="legend-item"><i class="legend-swatch holiday"></i>Gesetzlicher Feiertag</span>
+            <span class="legend-item"><i class="legend-swatch weekend"></i>Samstag und Sonntag</span>
+            <span class="legend-item"><span class="scope-pill">Bundesweit</span> Gilt bundesweit</span>
+            <span class="legend-item"><span class="scope-pill nrw">NRW</span> Zusätzlich in NRW</span>
+          </div>
+        </article>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <div><strong>Kalender · Nordrhein-Westfalen</strong><br>Reiner Anzeige-Kalender ohne Termine, Ereignisverwaltung oder Erinnerungen.</div>
+      <div>Rechtsgrundlage: Feiertagsgesetz NW, § 2 Abs. 1<br>Feiertagsdaten und Osterberechnung werden vollständig lokal erzeugt.</div>
+    </footer>
+  </main>
+
+  <dialog id="holidayDialog" aria-labelledby="dialogTitle">
+    <div class="dialog-inner">
+      <div class="dialog-top">
+        <div><div class="dialog-eyebrow">Gesetzlicher Feiertag · NRW</div><h2 class="dialog-title" id="dialogTitle">Feiertag</h2></div>
+        <button class="dialog-close" id="dialogCloseIcon" type="button" aria-label="Dialog schließen">✕</button>
+      </div>
+      <div class="dialog-date" id="dialogDate"></div>
+      <div class="dialog-description" id="dialogDescription"></div>
+      <div class="dialog-meta" id="dialogMeta"></div>
+      <div class="dialog-source">Rechtsgrundlage: § 2 Abs. 1 Feiertagsgesetz Nordrhein-Westfalen (FeiertagsG NW).</div>
+      <div class="dialog-footer"><button id="dialogCloseBtn" type="button">Schließen</button></div>
+    </div>
+  </dialog>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const STORAGE_KEY = 'nrw-calendar-display-settings-v1';
+    const DEFAULT_SETTINGS = Object.freeze({
+      defaultView: 'month',
+      firstDay: 1,
+      showWeeks: true,
+      holidayColor: '#69dded',
+      holidayTextColor: '#bff5fb',
+      holidayFontSize: 10.5
+    });
+    const MONTH_NAMES = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    const WEEKDAY_SHORT = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+    const WEEKDAY_LONG = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    const $ = (id) => document.getElementById(id);
+    const today = stripTime(new Date());
+    let settings = loadSettings();
+    let selectedDate = makeLocalDate(today.getFullYear(), today.getMonth(), 1);
+    let currentView = settings.defaultView;
+    let holidayCache = new Map();
+
+    // setFullYear statt new Date(year, ...) vermeidet die JS-Sonderbehandlung
+    // der Jahre 0 bis 99 als 1900 bis 1999.
+    function makeLocalDate(year, month, day=1) {
+      const date = new Date(0);
+      date.setHours(0,0,0,0);
+      date.setFullYear(year,month,day);
+      return date;
+    }
+    function stripTime(date) { return makeLocalDate(date.getFullYear(), date.getMonth(), date.getDate()); }
+    function addDays(date, amount) { return makeLocalDate(date.getFullYear(), date.getMonth(), date.getDate() + amount); }
+    function dateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
+    function sameDate(a,b) { return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+    function formatDate(date, options={}) {
+      return new Intl.DateTimeFormat('de-DE', options).format(date);
+    }
+    function formatLongDate(date) {
+      return formatDate(date,{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    }
+
+    // Meeus/Jones/Butcher: gregorianische Osterformel; liefert den Ostersonntag
+    // als lokales Datum. Alle beweglichen NRW-Feiertage werden relativ dazu erzeugt.
+    function getEasterSunday(year) {
+      const a = year % 19;
+      const b = Math.floor(year / 100);
+      const c = year % 100;
+      const d = Math.floor(b / 4);
+      const e = b % 4;
+      const f = Math.floor((b + 8) / 25);
+      const g = Math.floor((b - f + 1) / 3);
+      const h = (19 * a + b - d - g + 15) % 30;
+      const i = Math.floor(c / 4);
+      const k = c % 4;
+      const l = (32 + 2 * e + 2 * i - h - k) % 7;
+      const m = Math.floor((a + 11 * h + 22 * l) / 451);
+      const month = Math.floor((h + l - 7 * m + 114) / 31);
+      const day = ((h + l - 7 * m + 114) % 31) + 1;
+      return makeLocalDate(year, month - 1, day);
+    }
+
+    function getHolidays(year) {
+      if (holidayCache.has(year)) return holidayCache.get(year).map(item => ({...item}));
+      const fixed = [
+        {month:0,day:1,name:'Neujahr',shortName:'Neujahr',scope:'Bundesweit',rule:'Fester Feiertag am 1. Januar.',symbol:'✦'},
+        {month:4,day:1,name:'Tag der Arbeit',shortName:'Tag der Arbeit',scope:'Bundesweit',rule:'Fester Feiertag am 1. Mai.',symbol:'✦'},
+        {month:9,day:3,name:'Tag der Deutschen Einheit',shortName:'Deutsche Einheit',scope:'Bundesweit',rule:'Fester Feiertag am 3. Oktober.',symbol:'✦'},
+        {month:10,day:1,name:'Allerheiligen',shortName:'Allerheiligen',scope:'NRW',rule:'Fester Feiertag am 1. November; in dieser Anwendung als NRW-spezifisch gekennzeichnet.',symbol:'✦'},
+        {month:11,day:25,name:'1. Weihnachtstag',shortName:'1. Weihnachtstag',scope:'Bundesweit',rule:'Fester Feiertag am 25. Dezember.',symbol:'✦'},
+        {month:11,day:26,name:'2. Weihnachtstag',shortName:'2. Weihnachtstag',scope:'Bundesweit',rule:'Fester Feiertag am 26. Dezember.',symbol:'✦'}
+      ].map(item => { const date=makeLocalDate(year,item.month,item.day); return {...item,date,key:dateKey(date)}; });
+
+      const easter = getEasterSunday(year);
+      const movable = [
+        {offset:-2,name:'Karfreitag',shortName:'Karfreitag',scope:'Bundesweit',rule:'Zwei Tage vor Ostersonntag (gregorianischer Kalender).'},
+        {offset:1,name:'Ostermontag',shortName:'Ostermontag',scope:'Bundesweit',rule:'Ein Tag nach Ostersonntag (gregorianischer Kalender).'},
+        {offset:39,name:'Christi Himmelfahrt',shortName:'Christi Himmelfahrt',scope:'Bundesweit',rule:'39 Tage nach Ostersonntag.'},
+        {offset:50,name:'Pfingstmontag',shortName:'Pfingstmontag',scope:'Bundesweit',rule:'50 Tage nach Ostersonntag.'},
+        {offset:60,name:'Fronleichnam',shortName:'Fronleichnam',scope:'NRW',rule:'60 Tage nach Ostersonntag; Donnerstag nach dem Sonntag Trinitatis.'}
+      ].map(item => {
+        const date = addDays(easter,item.offset);
+        return {...item,date,key:dateKey(date),symbol:'✦'};
+      });
+
+      const result = [...fixed,...movable].sort((a,b)=>a.date-b.date);
+      holidayCache.set(year,result);
+      return result.map(item => ({...item}));
+    }
+
+    // ISO 8601: Die Kalenderwoche wird über den Donnerstag der jeweiligen
+    // ISO-Woche bestimmt; UTC-Arithmetik verhindert DST-bedingte Tagesfehler.
+    function getISOWeek(date) {
+      const value = new Date(0);
+      value.setUTCHours(0,0,0,0);
+      value.setUTCFullYear(date.getFullYear(),date.getMonth(),date.getDate());
+      const weekday = value.getUTCDay() || 7;
+      value.setUTCDate(value.getUTCDate() + 4 - weekday);
+      const yearStart = new Date(0);
+      yearStart.setUTCHours(0,0,0,0);
+      yearStart.setUTCFullYear(value.getUTCFullYear(),0,1);
+      return Math.ceil((((value - yearStart) / 86400000) + 1) / 7);
+    }
+
+    function getMonthGridStart(year,month,firstDay) {
+      const first = makeLocalDate(year,month,1);
+      const offset = (first.getDay()-firstDay+7)%7;
+      return addDays(first,-offset);
+    }
+    function monthCellCount(year,month,firstDay) {
+      const start = getMonthGridStart(year,month,firstDay);
+      const last = makeLocalDate(year,month+1,0);
+      const days = Math.round((stripTime(last)-stripTime(start))/86400000)+1;
+      return Math.ceil(days/7)*7;
+    }
+    function getHolidayMap(year) {
+      return new Map(getHolidays(year).map(item=>[item.key,item]));
+    }
+    function holidayFromKey(key) {
+      const year = Number(key.slice(0,4));
+      return getHolidays(year).find(item=>item.key===key) || null;
+    }
+    function getUpcomingHoliday() {
+      const candidates = [...getHolidays(today.getFullYear()),...getHolidays(today.getFullYear()+1)];
+      return candidates.filter(item=>item.date>=today).sort((a,b)=>a.date-b.date)[0] || null;
+    }
+    function loadSettings() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (!stored || typeof stored !== 'object') return {...DEFAULT_SETTINGS};
+        return sanitizeSettings({...DEFAULT_SETTINGS,...stored});
+      } catch (_) {
+        return {...DEFAULT_SETTINGS};
+      }
+    }
+    function sanitizeSettings(value) {
+      const validColor = (color,fallback) => /^#[0-9a-fA-F]{6}$/.test(color) ? color : fallback;
+      return {
+        defaultView: ['month','year','holidays'].includes(value.defaultView) ? value.defaultView : DEFAULT_SETTINGS.defaultView,
+        firstDay: Number(value.firstDay)===0 ? 0 : 1,
+        showWeeks: Boolean(value.showWeeks),
+        holidayColor: validColor(value.holidayColor,DEFAULT_SETTINGS.holidayColor),
+        holidayTextColor: validColor(value.holidayTextColor,DEFAULT_SETTINGS.holidayTextColor),
+        holidayFontSize: Number.isFinite(Number(value.holidayFontSize)) ? Math.max(8,Math.min(14,Number(value.holidayFontSize))) : DEFAULT_SETTINGS.holidayFontSize
+      };
+    }
+    function saveSettings(nextSettings) {
+      settings = sanitizeSettings(nextSettings);
+      try {
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(settings));
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    function applySettings() {
+      document.documentElement.style.setProperty('--holiday-color',settings.holidayColor);
+      document.documentElement.style.setProperty('--holiday-text',settings.holidayTextColor);
+      document.documentElement.style.setProperty('--holiday-font',`${settings.holidayFontSize}px`);
+    }
+    function syncSettingsForm() {
+      $('defaultView').value = settings.defaultView;
+      $('firstDay').value = String(settings.firstDay);
+      $('showWeeks').checked = settings.showWeeks;
+      $('holidayColor').value = settings.holidayColor;
+      $('holidayTextColor').value = settings.holidayTextColor;
+      $('holidayFontSize').value = settings.holidayFontSize;
+      $('holidayFontValue').textContent = `${settings.holidayFontSize.toLocaleString('de-DE')} px`;
+    }
+
+    function updateHeroDate() {
+      $('heroTodayDate').textContent = formatDate(today,{day:'2-digit',month:'long',year:'numeric'});
+      $('heroTodayWeekday').textContent = formatDate(today,{weekday:'long'});
+    }
+    function updateViewTabs() {
+      document.querySelectorAll('.view-tab[data-view]').forEach(button=>{
+        const active = button.dataset.view===currentView;
+        button.classList.toggle('active',active);
+        button.setAttribute('aria-pressed',String(active));
+      });
+    }
+    function updateTodayButton() {
+      // „Heute“ ist nur aktiv, wenn die Monatsansicht tatsächlich den
+      // aktuellen Monat im aktuellen Jahr zeigt.
+      const isCurrentMonth = currentView==='month'
+        && selectedDate.getFullYear()===today.getFullYear()
+        && selectedDate.getMonth()===today.getMonth();
+      const button=$('todayBtn');
+      button.classList.toggle('active',isCurrentMonth);
+      button.setAttribute('aria-pressed',String(isCurrentMonth));
+      button.title=isCurrentMonth?'Aktueller Monat':'Zum heutigen Datum';
+    }
+    function updateNextHoliday() {
+      const next = getUpcomingHoliday();
+      if (!next) {
+        $('nextHolidayDate').textContent = 'Kein Termin gefunden';
+        $('nextHolidayName').textContent = 'Feiertagsdaten nicht verfügbar';
+        $('nextHolidayCountdown').textContent = '';
+        return;
+      }
+      const diff = Math.round((stripTime(next.date)-today)/86400000);
+      $('nextHolidayDate').textContent = formatLongDate(next.date);
+      $('nextHolidayName').textContent = next.name;
+      $('nextHolidayCountdown').textContent = diff===0 ? 'Heute' : diff===1 ? 'Morgen' : `In ${diff} Tagen`;
+    }
+
+    function renderMonth() {
+      const year = selectedDate.getFullYear();
+      const month = selectedDate.getMonth();
+      const firstDay = settings.firstDay;
+      const holidays = getHolidayMap(year);
+      const grid = $('monthGrid');
+      grid.innerHTML = '';
+      grid.classList.toggle('with-weeks',settings.showWeeks);
+      $('viewTitle').textContent = `${MONTH_NAMES[month]} ${year}`;
+      $('viewSubtitle').textContent = `${settings.firstDay===1?'Wochenbeginn Montag':'Wochenbeginn Sonntag'} · ${settings.showWeeks?'ISO-Kalenderwochen eingeblendet':'Kalenderwochen ausgeblendet'}`;
+
+      if (settings.showWeeks) {
+        const weekHead = document.createElement('div');
+        weekHead.className = 'weekday-head week-label';
+        weekHead.textContent = 'KW';
+        weekHead.setAttribute('aria-label','Kalenderwoche');
+        grid.appendChild(weekHead);
+      }
+      for (let i=0;i<7;i++) {
+        const weekday = (firstDay+i)%7;
+        const head = document.createElement('div');
+        head.className = 'weekday-head';
+        head.textContent = WEEKDAY_SHORT[weekday];
+        head.setAttribute('aria-label',WEEKDAY_LONG[weekday]);
+        grid.appendChild(head);
+      }
+
+      const start = getMonthGridStart(year,month,firstDay);
+      const count = monthCellCount(year,month,firstDay);
+      for (let index=0;index<count;index+=7) {
+        const rowStart = addDays(start,index);
+        if (settings.showWeeks) {
+          const weekLabel = document.createElement('div');
+          weekLabel.className = 'week-number';
+          // Der Donnerstag der dargestellten Siebentageszeile ordnet diese
+          // auch bei Sonntag als erstem Wochentag einer ISO-KW zu.
+          weekLabel.textContent = String(getISOWeek(addDays(rowStart,(4-firstDay+7)%7))).padStart(2,'0');
+          grid.appendChild(weekLabel);
+        }
+        for (let dayIndex=0;dayIndex<7;dayIndex++) {
+          const date = addDays(rowStart,dayIndex);
+          const key = dateKey(date);
+          const holiday = holidays.get(key) || null;
+          const isToday = sameDate(date,today);
+          const inMonth = date.getMonth()===month;
+          const isWeekend = date.getDay()===0 || date.getDay()===6;
+          const cell = document.createElement(holiday?'button':'div');
+          if (holiday) cell.type = 'button';
+          cell.className = `day-cell${isWeekend?' weekend':''}${!inMonth?' outside-month':''}${isToday?' today':''}${holiday?' holiday':''}`;
+          if (holiday) {
+            cell.title = `${formatLongDate(date)} · ${holiday.name} · ${holiday.scope==='NRW'?'NRW':'bundesweit'}`;
+            cell.setAttribute('aria-label',`${formatLongDate(date)}: ${holiday.name}, gesetzlicher Feiertag ${holiday.scope==='NRW'?'in Nordrhein-Westfalen':'bundesweit'}. Details anzeigen.`);
+            cell.addEventListener('click',()=>showHolidayDetails(holiday));
+          } else {
+            cell.setAttribute('aria-label',formatLongDate(date));
+          }
+          const number = document.createElement('span');
+          number.className = 'day-number';
+          number.textContent = String(date.getDate());
+          cell.appendChild(number);
+          if (holiday) {
+            const label = document.createElement('span');
+            label.className = 'holiday-label';
+            label.innerHTML = `<span class="holiday-symbol" aria-hidden="true">✦</span><span class="holiday-label-text">${escapeHTML(holiday.name)}</span>`;
+            cell.appendChild(label);
+            if (holiday.scope==='NRW') {
+              const scope = document.createElement('span');
+              scope.className='scope-mini';
+              scope.textContent='NRW';
+              cell.appendChild(scope);
+            }
+          }
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    function renderYear() {
+      const year = selectedDate.getFullYear();
+      $('viewTitle').textContent = `Jahresübersicht ${year}`;
+      $('viewSubtitle').textContent = 'Alle zwölf Monate · gesetzliche Feiertage direkt markiert';
+      const grid = $('yearGrid');
+      grid.innerHTML = '';
+      const holidays = getHolidays(year);
+      const holidayMap = new Map(holidays.map(item=>[item.key,item]));
+      for (let month=0;month<12;month++) {
+        const monthHolidays = holidays.filter(item=>item.date.getMonth()===month);
+        const card = document.createElement('article');
+        card.className='year-month';
+        const head = document.createElement('div');
+        head.className='year-month-head';
+        const open = document.createElement('button');
+        open.type='button'; open.className='month-open'; open.textContent=MONTH_NAMES[month];
+        open.setAttribute('aria-label',`${MONTH_NAMES[month]} ${year} in Monatsansicht öffnen`);
+        open.addEventListener('click',()=>{selectedDate=makeLocalDate(year,month,1);setView('month');});
+        const count = document.createElement('span');
+        count.className='month-holiday-count';
+        count.textContent=monthHolidays.length ? `${monthHolidays.length} Feiertag${monthHolidays.length===1?'':'e'}` : '—';
+        head.append(open,count); card.appendChild(head);
+
+        const mini = document.createElement('div'); mini.className='mini-grid';
+        const start = getMonthGridStart(year,month,settings.firstDay);
+        const total = monthCellCount(year,month,settings.firstDay);
+        for (let i=0;i<7;i++) {
+          const day = document.createElement('span'); day.className='mini-weekday'; day.textContent=WEEKDAY_SHORT[(settings.firstDay+i)%7].slice(0,1); mini.appendChild(day);
+        }
+        for (let i=0;i<total;i++) {
+          const date=addDays(start,i);
+          const day=document.createElement('span');
+          if (date.getMonth()!==month) { day.className='mini-day empty'; day.textContent='·'; }
+          else {
+            const holiday=holidayMap.get(dateKey(date));
+            const classes=['mini-day'];
+            if (date.getDay()===0 || date.getDay()===6) classes.push('weekend');
+            if (sameDate(date,today)) classes.push('today');
+            if (holiday) classes.push('holiday');
+            day.className=classes.join(' ');
+            day.textContent=String(date.getDate());
+            if (holiday) day.title=`${formatLongDate(date)} · ${holiday.name}`;
+            else day.title=formatLongDate(date);
+          }
+          mini.appendChild(day);
+        }
+        card.appendChild(mini);
+        if (monthHolidays.length) {
+          const list=document.createElement('ul'); list.className='month-holidays';
+          monthHolidays.forEach(item=>{
+            const li=document.createElement('li');
+            li.innerHTML=`<strong>${String(item.date.getDate()).padStart(2,'0')}.</strong>${escapeHTML(item.shortName)}${item.scope==='NRW'?' · NRW':''}`;
+            list.appendChild(li);
+          });
+          card.appendChild(list);
+        }
+        grid.appendChild(card);
+      }
+    }
+
+    function renderHolidayList() {
+      const year=selectedDate.getFullYear();
+      const holidays=getHolidays(year);
+      $('viewTitle').textContent=`Feiertage ${year}`;
+      $('viewSubtitle').textContent=`Alle ${holidays.length} gesetzlichen Feiertage in chronologischer Reihenfolge`;
+      const list=$('holidayList'); list.innerHTML='';
+      holidays.forEach(item=>{
+        const row=document.createElement('article'); row.className='holiday-row';
+        const datebox=document.createElement('div'); datebox.className='holiday-datebox';
+        datebox.innerHTML=`<strong>${String(item.date.getDate()).padStart(2,'0')}</strong><span>${MONTH_NAMES[item.date.getMonth()].slice(0,3)}</span>`;
+        const main=document.createElement('div'); main.className='holiday-row-main';
+        const title=document.createElement('div'); title.className='holiday-row-title'; title.textContent=item.name;
+        const sub=document.createElement('div'); sub.className='holiday-row-sub'; sub.textContent=`${formatDate(item.date,{weekday:'long'})} · ${year}`;
+        main.append(title,sub);
+        const scope=document.createElement('span'); scope.className=`scope-pill${item.scope==='NRW'?' nrw':''}`; scope.textContent=item.scope;
+        const details=document.createElement('button'); details.className='holiday-row-action'; details.type='button'; details.textContent='Details';
+        details.addEventListener('click',()=>showHolidayDetails(item));
+        row.append(datebox,main,scope,details);
+        list.appendChild(row);
+      });
+      if (!holidays.length) list.innerHTML='<div class="empty-state">Für dieses Jahr wurden keine Feiertage berechnet.</div>';
+    }
+
+    function showHolidayDetails(holiday) {
+      $('dialogTitle').textContent=holiday.name;
+      $('dialogDate').textContent=formatLongDate(holiday.date);
+      $('dialogDescription').textContent=holiday.rule;
+      $('dialogMeta').innerHTML=`<span class="scope-pill${holiday.scope==='NRW'?' nrw':''}">${holiday.scope}</span><span class="scope-pill">Gesetzlicher Feiertag</span>`;
+      const dialog=$('holidayDialog');
+      if (typeof dialog.showModal==='function') dialog.showModal();
+      else dialog.setAttribute('open','');
+    }
+    function closeHolidayDialog() {
+      const dialog=$('holidayDialog');
+      if (typeof dialog.close==='function' && dialog.open) dialog.close();
+      else dialog.removeAttribute('open');
+    }
+
+    function setView(view) {
+      if (!['month','year','holidays'].includes(view)) return;
+      currentView=view;
+      $('monthView').hidden=view!=='month';
+      $('yearView').hidden=view!=='year';
+      $('holidaysView').hidden=view!=='holidays';
+      $('monthNav').hidden=view!=='month';
+      $('yearNav').hidden=view==='month';
+      updateViewTabs();
+      renderCurrentView();
+    }
+    function renderCurrentView() {
+      if (currentView==='month') renderMonth();
+      else if (currentView==='year') renderYear();
+      else renderHolidayList();
+      updateTodayButton();
+      updateNextHoliday();
+    }
+    function shiftMonth(amount) {
+      selectedDate=makeLocalDate(selectedDate.getFullYear(),selectedDate.getMonth()+amount,1);
+      renderCurrentView();
+    }
+    function shiftYear(amount) {
+      selectedDate=makeLocalDate(selectedDate.getFullYear()+amount,selectedDate.getMonth(),1);
+      renderCurrentView();
+    }
+    function goToday() {
+      selectedDate=makeLocalDate(today.getFullYear(),today.getMonth(),1);
+      setView('month');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    function toggleSettings(force) {
+      const panel=$('setupPanel');
+      const open=typeof force==='boolean'?force:panel.hidden;
+      panel.hidden=!open;
+      $('settingsToggleBtn').setAttribute('aria-expanded',String(open));
+      if (open) {syncSettingsForm(); $('setupFeedback').textContent='Änderungen werden erst nach dem Übernehmen aktiv.';}
+    }
+    function applySettingsFromForm() {
+      const next={
+        defaultView:$('defaultView').value,
+        firstDay:Number($('firstDay').value),
+        showWeeks:$('showWeeks').checked,
+        holidayColor:$('holidayColor').value,
+        holidayTextColor:$('holidayTextColor').value,
+        holidayFontSize:Number($('holidayFontSize').value)
+      };
+      const stored=saveSettings(next);
+      applySettings();
+      renderCurrentView();
+      $('setupFeedback').textContent=stored?'Einstellungen lokal gespeichert.':'localStorage ist nicht verfügbar. Die Einstellungen gelten bis zum Schließen dieser Seite.';
+    }
+    function resetSettings() {
+      const stored=saveSettings({...DEFAULT_SETTINGS});
+      applySettings(); syncSettingsForm(); renderCurrentView();
+      $('setupFeedback').textContent=stored?'Standardwerte wiederhergestellt und gespeichert.':'Standardwerte für diese Sitzung wiederhergestellt.';
+    }
+
+    // Öffentliche, reine Berechnungsfunktionen erleichtern die Offline-Prüfung.
+    // Sie verändern weder Einstellungen noch Kalenderzustand.
+    window.KalenderNRW = Object.freeze({
+      getEasterSunday: year => new Date(getEasterSunday(year)),
+      getHolidays: year => getHolidays(year).map(item=>({name:item.name,date:new Date(item.date),scope:item.scope,key:item.key})),
+      getISOWeek: date => getISOWeek(makeLocalDate(date.getFullYear(),date.getMonth(),date.getDate())),
+      getDateKey: date => dateKey(date)
+    });
+
+    $('todayBtn').addEventListener('click',goToday);
+    $('settingsToggleBtn').addEventListener('click',()=>toggleSettings());
+    $('closeSettingsBtn').addEventListener('click',()=>toggleSettings(false));
+    $('saveSettingsBtn').addEventListener('click',applySettingsFromForm);
+    $('resetSettingsBtn').addEventListener('click',resetSettings);
+    $('holidayFontSize').addEventListener('input',()=>{$('holidayFontValue').textContent=`${Number($('holidayFontSize').value).toLocaleString('de-DE')} px`;});
+    $('prevMonthBtn').addEventListener('click',()=>shiftMonth(-1));
+    $('nextMonthBtn').addEventListener('click',()=>shiftMonth(1));
+    $('prevYearBtn').addEventListener('click',()=>shiftYear(-1));
+    $('nextYearBtn').addEventListener('click',()=>shiftYear(1));
+    document.querySelectorAll('.view-tab[data-view]').forEach(button=>button.addEventListener('click',()=>setView(button.dataset.view)));
+    $('dialogCloseIcon').addEventListener('click',closeHolidayDialog);
+    $('dialogCloseBtn').addEventListener('click',closeHolidayDialog);
+    $('holidayDialog').addEventListener('click',event=>{if(event.target===$('holidayDialog')) closeHolidayDialog();});
+
+    applySettings();
+    syncSettingsForm();
+    updateHeroDate();
+    setView(currentView);
+  })();
+  </script>
+</body>
+</html>
