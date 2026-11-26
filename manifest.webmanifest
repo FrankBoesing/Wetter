@@ -1,0 +1,62 @@
+{
+  "id": "./",
+  "name": "Wetter & Kalender",
+  "short_name": "Wetter",
+  "description": "Wetter, Regenradar und Feiertagskalender in einer installierbaren Web-App.",
+  "lang": "de-DE",
+  "start_url": "./Wetter.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "background_color": "#08111f",
+  "theme_color": "#08111f",
+  "prefer_related_applications": false,
+  "categories": [
+    "weather",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Kalender öffnen",
+      "short_name": "Kalender",
+      "url": "./Kalender.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Regenradar öffnen",
+      "short_name": "Regenradar",
+      "url": "./Regenradar.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

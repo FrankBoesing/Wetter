@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0b1220" />
+  <meta name="theme-color" content="#08111f" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Wetter" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="description" content="Detailliertes aktuelles Wetter und 7-Tage-Wettervorhersage für bis zu vier gespeicherte Orte." />
   <title>Wetter</title>
   <style>
@@ -1855,5 +1861,14 @@
   setInterval(() => { loadWeather(false); loadWarnings(false); },WEATHER_CACHE_TTL_MS);
 })();
 </script>
+  <script>
+    // PWA: Service Worker fuer App-Shell und Offline-Fallback registrieren.
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js', { scope: './' })
+          .catch(error => console.error('Service Worker konnte nicht registriert werden:', error));
+      });
+    }
+  </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 # Wetter & Kalender
 
-Zwei eigenständige, mobilfreundliche HTML-Anwendungen im gemeinsamen Design. Die Seiten werden statisch über **GitHub Pages** veröffentlicht – ohne eigenen Server und ohne Benutzerkonto.
+Drei mobilfreundliche HTML-Anwendungen im gemeinsamen Design. Die Seiten werden statisch über **GitHub Pages** veröffentlicht – ohne eigenen Server und ohne Benutzerkonto.
 
 ## Anwendungen
 
@@ -51,8 +51,15 @@ Es gibt keine Terminverwaltung, Ereigniserstellung oder Erinnerungsfunktion.
 | `index.html` | Leitet auf die Wetterseite weiter |
 | `Wetter.html` | Wetterübersicht |
 | `Kalender.html` | Feiertags- und Ereigniskalender |
-| `Regenradar.html` | Eingebettetes NIERAD-Regenradar; übernimmt den Wetterort über URL-Parameter oder zeigt Deutschland |
+| `Regenradar.html` | Eingebettetes NIERAD-Regenradar; übernimmt den Wetterort über URL-Parameter oder zeigt Deutschland |\n| `manifest.webmanifest` | PWA-Name, Startseite, Anzeigemodus und App-Icons |\n| `service-worker.js` | App-Shell-Cache, Aktualisierung und Offline-Fallback |\n| `offline.html` | Lokale Offline-Hinweisseite |\n| `icons/` | PNG-Icons für App-Launcher und maskable Darstellung |
 | `README.md` | Projektbeschreibung und Links |
+
+## Progressive Web App
+
+- Die Anwendung ist über GitHub Pages (HTTPS) als PWA installierbar.
+- Das Manifest startet die App auf der Wetterseite; Kalender und Regenradar sind innerhalb derselben App erreichbar.
+- Der Service Worker speichert die lokalen HTML-Seiten, das Manifest und die App-Icons im Cache und stellt bei Offline-Navigation die gespeicherte Seite bzw. eine Offline-Fallback-Seite bereit.
+- Der Cache enthält in dieser ersten Ausbaustufe nur die App-Shell. Wetter-, Luftqualitäts-, Warnungs- und Radar-Daten werden nicht offline gespeichert und benötigen weiterhin eine Internetverbindung.
 
 ## Betrieb
 
