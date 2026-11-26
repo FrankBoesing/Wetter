@@ -157,10 +157,11 @@
     });
 
     const query = new URLSearchParams(window.location.search);
-    const latitude = Number(query.get('lat'));
-    const longitude = Number(query.get('lon'));
-    const hasPlace = query.has('lat') && query.has('lon') &&
-      Number.isFinite(latitude) && latitude >= -90 && latitude <= 90 &&
+    const latitudeText = query.get('lat');
+    const longitudeText = query.get('lon');
+    const latitude = latitudeText && latitudeText.trim() ? Number(latitudeText) : NaN;
+    const longitude = longitudeText && longitudeText.trim() ? Number(longitudeText) : NaN;
+    const hasPlace = Number.isFinite(latitude) && latitude >= -90 && latitude <= 90 &&
       Number.isFinite(longitude) && longitude >= -180 && longitude <= 180;
     const placeName = hasPlace ? (query.get('ort') || 'Ausgewählter Wetterort').trim().slice(0,100) : '';
     const center = hasPlace ? { latitude, longitude, zoom:9 } : DEFAULT_GERMANY;
