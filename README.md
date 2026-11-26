@@ -6,6 +6,7 @@ Zwei eigenständige, mobilfreundliche HTML-Anwendungen im gemeinsamen Design. Di
 
 - **[Wetter öffnen](https://frankboesing.github.io/Wetter/)**
 - **[Kalender öffnen](https://frankboesing.github.io/Wetter/Kalender.html)**
+- **[Regenradar öffnen](https://frankboesing.github.io/Wetter/Regenradar.html)**
 
 ## Wetter
 
