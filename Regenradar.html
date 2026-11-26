@@ -55,6 +55,7 @@
     .map-status { color:var(--muted); font-size:11px; }
     .radar-frame { width:100%; overflow:hidden; border:1px solid rgba(164,190,220,.15); border-radius:15px; background:#e8edf2; }
     .radar-frame iframe { display:block; width:100%; height:auto; min-height:560px; aspect-ratio:1 / 1; border:0; background:#e8edf2; }
+    .mobile-radar-card { display:none; }
     .source-row { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 18px; margin:14px 5px 3px; color:#8ea3bd; font-size:10px; line-height:1.6; }
     .source-row a { color:#a9c8e5; text-decoration:none; }
     .source-row a:hover { color:var(--cyan); }
@@ -77,8 +78,34 @@
       .map-header { padding:4px 3px 10px; }
       .map-title { font-size:13px; }
       .map-status { font-size:9px; }
-      .radar-frame { border-radius:12px; }
-      .radar-frame iframe { min-height:560px; }
+      .radar-frame { display:none; }
+      .mobile-radar-card {
+        display:grid; gap:12px; padding:18px 15px;
+        border:1px solid rgba(105,221,237,.20); border-radius:14px;
+        background:linear-gradient(145deg,rgba(22,48,70,.88),rgba(20,34,57,.92));
+      }
+      .mobile-radar-mark {
+        display:grid; place-items:center; width:42px; height:42px;
+        border:1px solid rgba(105,221,237,.25); border-radius:13px;
+        color:var(--cyan); background:rgba(105,221,237,.10);
+      }
+      .mobile-radar-mark svg { width:22px; height:22px; }
+      .mobile-radar-title { margin:0; color:var(--text); font-size:15px; font-weight:750; }
+      .mobile-radar-copy,.mobile-radar-hint { margin:0; color:#a9bfd6; font-size:11px; line-height:1.6; }
+      .mobile-radar-primary,.mobile-radar-secondary {
+        display:flex; align-items:center; justify-content:center; gap:8px;
+        width:100%; min-height:48px; padding:12px 14px; border-radius:12px;
+        text-align:center; text-decoration:none; font-size:12px; font-weight:750;
+      }
+      .mobile-radar-primary {
+        color:#071522; background:linear-gradient(115deg,#77e5ef,#83baff);
+        box-shadow:0 8px 24px rgba(50,155,190,.16);
+      }
+      .mobile-radar-secondary {
+        color:#dcecff; border:1px solid rgba(164,190,220,.20);
+        background:rgba(8,17,31,.35);
+      }
+      .mobile-radar-hint { color:var(--muted); font-size:10px; }
       .source-row { margin:11px 3px 2px; font-size:9px; }
       .privacy-note { padding:11px 12px; font-size:9px; }
       .footer { flex-direction:column; gap:7px; margin-top:19px; padding-top:12px; font-size:9px; }
@@ -137,9 +164,22 @@
           allowfullscreen
           src="about:blank"></iframe>
       </div>
+      <div class="mobile-radar-card" aria-label="Regenradar auf dem Smartphone öffnen">
+        <div class="mobile-radar-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 16.5 8.5 11l3.5 3.5L21 5.5"/><path d="M15 5.5h6v6"/>
+            <path d="M4 20h16"/>
+          </svg>
+        </div>
+        <h3 class="mobile-radar-title">Regenradar in der großen Ansicht</h3>
+        <p class="mobile-radar-copy" id="mobileRadarPlace">Die vollständige NIERAD-Karte bietet mehr Platz für Karte, Zeitleiste und Bedienung.</p>
+        <a class="mobile-radar-primary" href="https://www.nierad.de/" target="_blank" rel="nofollow noopener">Vollständige Radarkarte öffnen ↗</a>
+        <a class="mobile-radar-secondary" id="mobileExactRadarLink" href="https://www.nierad.de/" target="_blank" rel="nofollow noopener">Ausgewählten Kartenausschnitt separat öffnen ↗</a>
+        <p class="mobile-radar-hint">Der obere Link öffnet die vollständige NIERAD-Karte; den Ort dort bei Bedarf über die Suche auswählen. Der zweite Link übernimmt den hier ausgewählten Kartenausschnitt.</p>
+      </div>
       <div class="source-row">
         <span>Radar: <a href="https://www.nierad.de/" target="_blank" rel="nofollow noopener">NIERAD – Niederschlag Deutschland</a></span>
-        <span><a href="https://www.nierad.de/regenradar-widget" target="_blank" rel="nofollow noopener">Informationen zur Einbettung und zu den Datenquellen</a></span>
+        <span><a id="placeRadarLink" href="https://www.nierad.de/" target="_blank" rel="nofollow noopener">Ausgewählten Kartenausschnitt öffnen</a> · <a href="https://www.nierad.de/regenradar-widget" target="_blank" rel="nofollow noopener">Einbettung und Datenquellen</a></span>
       </div>
     </section>
 
@@ -196,7 +236,20 @@
     document.getElementById('mapStatus').textContent = hasPlace ? `Kartenmittelpunkt: ${center.latitude.toFixed(3)}, ${center.longitude.toFixed(3)}` : 'Gesamtübersicht Deutschland';
     const frame = document.getElementById('radarFrame');
     frame.title = hasPlace ? `Interaktives Regenradar für ${placeName}` : 'Interaktives Regenradar für Deutschland';
-    frame.src = embed.toString();
+    const radarUrl = embed.toString();
+    frame.src = radarUrl;
+
+    const placeRadarLink = document.getElementById('placeRadarLink');
+    placeRadarLink.href = radarUrl;
+    placeRadarLink.textContent = hasPlace
+      ? `Kartenausschnitt ${placeName} separat öffnen`
+      : 'Deutschland-Ausschnitt separat öffnen';
+
+    const mobileExactRadarLink = document.getElementById('mobileExactRadarLink');
+    mobileExactRadarLink.href = radarUrl;
+    document.getElementById('mobileRadarPlace').textContent = hasPlace
+      ? `Der ausgewählte Ausschnitt zeigt ${placeName}. Für die vollständige NIERAD-Karte kannst du den Ort dort über die Suche erneut auswählen.`
+      : 'Aktuell ist die Deutschland-Übersicht ausgewählt. Die vollständige NIERAD-Karte öffnet sich in einem eigenen Tab.';
   })();
   </script>
   <script>
