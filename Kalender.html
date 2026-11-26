@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0b1220" />
-  <meta name="description" content="Offline-Kalender mit allen gesetzlichen Feiertagen in Nordrhein-Westfalen." />
-  <title>Kalender · NRW</title>
+  <meta name="description" content="Offline-Kalender mit den gesetzlichen Feiertagen aller 16 deutschen Bundesländer." />
+  <title>Kalender · Deutschland</title>
   <style>
     :root {
       color-scheme: dark;
@@ -166,7 +166,9 @@
     .side-legend { display:grid; gap:10px; margin-top:13px; }
     .side-legend .legend-item { color:#a5b8ce; font-size:11px; }
     .scope-pill { display:inline-flex; align-items:center; padding:3px 7px; border-radius:7px; font-size:9px; font-weight:800; letter-spacing:.04em; color:#c7d9ef; background:rgba(117,170,255,.12); border:1px solid rgba(117,170,255,.17); white-space:nowrap; }
-    .scope-pill.nrw { color:#d0c4ff; background:rgba(168,139,255,.13); border-color:rgba(168,139,255,.2); }
+    .scope-pill.state { color:#d0c4ff; background:rgba(168,139,255,.13); border-color:rgba(168,139,255,.2); }
+    .scope-pill.regional { color:#ffd5a8; background:rgba(255,189,117,.12); border-color:rgba(255,189,117,.22); }
+    .scope-mini.regional { background:rgba(255,189,117,.13); color:#ffd5a8; }
 
     .year-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
     .year-month { min-width:0; padding:14px; background:rgba(118,155,194,.045); border:1px solid rgba(164,190,220,.09); border-radius:16px; transition:border-color .2s,background .2s; }
@@ -352,10 +354,15 @@
 
     <section class="panel setup-panel" id="setupPanel" hidden aria-labelledby="setupTitle">
       <div class="section-head">
-        <div><h2 class="section-title" id="setupTitle">Kalender-Einstellungen</h2><div class="section-sub">Darstellung anpassen · Bundesland: Nordrhein-Westfalen</div></div>
+        <div><h2 class="section-title" id="setupTitle">Kalender-Einstellungen</h2><div class="section-sub" id="setupStateSubtitle">Darstellung und Bundesland auswählen</div></div>
       </div>
-      <p class="setup-intro">Hier werden ausschließlich Anzeigeoptionen festgelegt. Termine, Ereignisse oder Erinnerungen werden nicht verwaltet. Einstellungen werden lokal in diesem Browser gespeichert, sofern localStorage verfügbar ist.</p>
+      <p class="setup-intro">Wähle dein Bundesland und passe die Darstellung an. Regionale Sonderfälle (zum Beispiel Mariä Himmelfahrt in Teilen Bayerns) werden gesondert gekennzeichnet. Termine, Ereignisse und Erinnerungen werden nicht verwaltet. Einstellungen werden lokal in diesem Browser gespeichert, sofern localStorage verfügbar ist.</p>
       <div class="setup-grid">
+        <label class="setup-field" for="federalState">Bundesland
+          <select id="federalState">
+            <option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option><option value="BE">Berlin</option><option value="BB">Brandenburg</option><option value="HB">Bremen</option><option value="HH">Hamburg</option><option value="HE">Hessen</option><option value="MV">Mecklenburg-Vorpommern</option><option value="NI">Niedersachsen</option><option value="NW">Nordrhein-Westfalen</option><option value="RP">Rheinland-Pfalz</option><option value="SL">Saarland</option><option value="SN">Sachsen</option><option value="ST">Sachsen-Anhalt</option><option value="SH">Schleswig-Holstein</option><option value="TH">Thüringen</option>
+          </select>
+        </label>
         <label class="setup-field" for="defaultView">Standardansicht
           <select id="defaultView"><option value="month">Monatsansicht</option><option value="year">Jahresübersicht</option><option value="holidays">Feiertagsliste</option></select>
         </label>
@@ -381,14 +388,14 @@
       </div>
     </section>
 
-    <section class="hero" aria-label="Kalender für Nordrhein-Westfalen">
+    <section class="hero" id="heroSection" aria-label="Kalender für das ausgewählte Bundesland">
       <div class="hero-content">
         <div>
           <div class="eyebrow">Dein Kalender auf einen Blick</div>
           <h1>Kalender</h1>
-          <div class="location-line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Nordrhein-Westfalen · Deutschland</span></div>
+          <div class="location-line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span id="stateNameLine">Nordrhein-Westfalen · Deutschland</span></div>
         </div>
-        <div class="hero-meta"><strong id="heroTodayDate">--</strong><span id="heroTodayWeekday">--</span><br><span>Alle 11 gesetzlichen Feiertage · vollständig offline</span></div>
+        <div class="hero-meta"><strong id="heroTodayDate">--</strong><span id="heroTodayWeekday">--</span><br><span id="heroHolidaySummary">11 landesweite Feiertage · vollständig offline</span></div>
       </div>
     </section>
 
@@ -443,11 +450,12 @@
           <div class="next-countdown" id="nextHolidayCountdown">--</div>
         </article>
         <article class="panel side-card">
-          <h3>Feiertage in NRW</h3>
-          <div class="stat-row"><span>Gesetzliche Feiertage</span><strong>11</strong></div>
-          <div class="stat-row"><span>Bundesweit</span><strong>9</strong></div>
-          <div class="stat-row"><span>Zusätzlich in NRW</span><strong>2</strong></div>
-          <p>Die Berechnung erfolgt jedes Jahr neu anhand des gregorianischen Osterdatums.</p>
+          <h3 id="stateHolidayTitle">Feiertage in Nordrhein-Westfalen</h3>
+          <div class="stat-row"><span>Landesweit gesetzlich</span><strong id="stateHolidayCount">11</strong></div>
+          <div class="stat-row"><span>Bundesweit</span><strong id="federalHolidayCount">9</strong></div>
+          <div class="stat-row"><span>Zusätzlich im Bundesland</span><strong id="stateSpecificHolidayCount">2</strong></div>
+          <div class="stat-row" id="regionalHolidayRow" hidden><span>Regionale Sonderfälle</span><strong id="regionalHolidayCount">0</strong></div>
+          <p id="stateHolidayDescription">Die Berechnung erfolgt jedes Jahr neu anhand des gregorianischen Osterdatums.</p>
         </article>
         <article class="panel side-card">
           <h3>Legende</h3>
@@ -455,29 +463,30 @@
             <span class="legend-item"><i class="legend-swatch today"></i>Heutiger Tag</span>
             <span class="legend-item"><i class="legend-swatch holiday"></i>Gesetzlicher Feiertag</span>
             <span class="legend-item"><i class="legend-swatch weekend"></i>Samstag und Sonntag</span>
-            <span class="legend-item"><span class="scope-pill">Bundesweit</span> Gilt bundesweit</span>
-            <span class="legend-item"><span class="scope-pill nrw">NRW</span> Zusätzlich in NRW</span>
+            <span class="legend-item"><span class="scope-pill">DE</span> Gilt bundesweit</span>
+            <span class="legend-item"><span class="scope-pill state">Land</span> Zusätzlich im gewählten Bundesland</span>
+            <span class="legend-item"><span class="scope-pill regional">Regional</span> Gilt nur in bestimmten Orten</span>
           </div>
         </article>
       </aside>
     </div>
 
     <footer class="footer">
-      <div><strong>Kalender · Nordrhein-Westfalen</strong><br>Reiner Anzeige-Kalender ohne Termine, Ereignisverwaltung oder Erinnerungen.</div>
-      <div>Rechtsgrundlage: Feiertagsgesetz NW, § 2 Abs. 1<br>Feiertagsdaten und Osterberechnung werden vollständig lokal erzeugt.</div>
+      <div><strong id="footerStateName">Kalender · Nordrhein-Westfalen</strong><br>Reiner Anzeige-Kalender ohne Termine, Ereignisverwaltung oder Erinnerungen.</div>
+      <div>Rechtsgrundlage: Feiertagsrecht des ausgewählten Bundeslandes<br>Feiertagsdaten und Osterberechnung werden vollständig lokal erzeugt.</div>
     </footer>
   </main>
 
   <dialog id="holidayDialog" aria-labelledby="dialogTitle">
     <div class="dialog-inner">
       <div class="dialog-top">
-        <div><div class="dialog-eyebrow">Gesetzlicher Feiertag · NRW</div><h2 class="dialog-title" id="dialogTitle">Feiertag</h2></div>
+        <div><div class="dialog-eyebrow" id="dialogEyebrow">Gesetzlicher Feiertag</div><h2 class="dialog-title" id="dialogTitle">Feiertag</h2></div>
         <button class="dialog-close" id="dialogCloseIcon" type="button" aria-label="Dialog schließen">✕</button>
       </div>
       <div class="dialog-date" id="dialogDate"></div>
       <div class="dialog-description" id="dialogDescription"></div>
       <div class="dialog-meta" id="dialogMeta"></div>
-      <div class="dialog-source">Rechtsgrundlage: § 2 Abs. 1 Feiertagsgesetz Nordrhein-Westfalen (FeiertagsG NW).</div>
+      <div class="dialog-source" id="dialogSourceText">Rechtsgrundlage: Feiertagsrecht des ausgewählten Bundeslandes.</div>
       <div class="dialog-footer"><button id="dialogCloseBtn" type="button">Schließen</button></div>
     </div>
   </dialog>
@@ -493,11 +502,31 @@
       showWeeks: true,
       holidayColor: '#69dded',
       holidayTextColor: '#bff5fb',
-      holidayFontSize: 10.5
+      holidayFontSize: 10.5,
+      federalState: 'NW'
     });
     const MONTH_NAMES = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
     const WEEKDAY_SHORT = ['So','Mo','Di','Mi','Do','Fr','Sa'];
     const WEEKDAY_LONG = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    const FEDERAL_STATES = Object.freeze([
+      {code:'BW',name:'Baden-Württemberg'},
+      {code:'BY',name:'Bayern'},
+      {code:'BE',name:'Berlin'},
+      {code:'BB',name:'Brandenburg'},
+      {code:'HB',name:'Bremen'},
+      {code:'HH',name:'Hamburg'},
+      {code:'HE',name:'Hessen'},
+      {code:'MV',name:'Mecklenburg-Vorpommern'},
+      {code:'NI',name:'Niedersachsen'},
+      {code:'NW',name:'Nordrhein-Westfalen'},
+      {code:'RP',name:'Rheinland-Pfalz'},
+      {code:'SL',name:'Saarland'},
+      {code:'SN',name:'Sachsen'},
+      {code:'ST',name:'Sachsen-Anhalt'},
+      {code:'SH',name:'Schleswig-Holstein'},
+      {code:'TH',name:'Thüringen'}
+    ]);
+
     const $ = (id) => document.getElementById(id);
     const today = stripTime(new Date());
     let settings = loadSettings();
@@ -528,7 +557,7 @@
     }
 
     // Meeus/Jones/Butcher: gregorianische Osterformel; liefert den Ostersonntag
-    // als lokales Datum. Alle beweglichen NRW-Feiertage werden relativ dazu erzeugt.
+    // als lokales Datum. Bewegliche Feiertage aller Bundesländer werden relativ dazu erzeugt.
     function getEasterSunday(year) {
       const a = year % 19;
       const b = Math.floor(year / 100);
@@ -547,32 +576,145 @@
       return makeLocalDate(year, month - 1, day);
     }
 
-    function getHolidays(year) {
-      if (holidayCache.has(year)) return holidayCache.get(year).map(item => ({...item}));
-      const fixed = [
-        {month:0,day:1,name:'Neujahr',shortName:'Neujahr',scope:'Bundesweit',rule:'Fester Feiertag am 1. Januar.',symbol:'✦'},
-        {month:4,day:1,name:'Tag der Arbeit',shortName:'Tag der Arbeit',scope:'Bundesweit',rule:'Fester Feiertag am 1. Mai.',symbol:'✦'},
-        {month:9,day:3,name:'Tag der Deutschen Einheit',shortName:'Deutsche Einheit',scope:'Bundesweit',rule:'Fester Feiertag am 3. Oktober.',symbol:'✦'},
-        {month:10,day:1,name:'Allerheiligen',shortName:'Allerheiligen',scope:'NRW',rule:'Fester Feiertag am 1. November; in dieser Anwendung als NRW-spezifisch gekennzeichnet.',symbol:'✦'},
-        {month:11,day:25,name:'1. Weihnachtstag',shortName:'1. Weihnachtstag',scope:'Bundesweit',rule:'Fester Feiertag am 25. Dezember.',symbol:'✦'},
-        {month:11,day:26,name:'2. Weihnachtstag',shortName:'2. Weihnachtstag',scope:'Bundesweit',rule:'Fester Feiertag am 26. Dezember.',symbol:'✦'}
-      ].map(item => { const date=makeLocalDate(year,item.month,item.day); return {...item,date,key:dateKey(date)}; });
+    const FIXED_HOLIDAY_DEFS = Object.freeze({
+      newYear: {month:0,day:1,name:'Neujahr',shortName:'Neujahr',rule:'Fester Feiertag am 1. Januar.'},
+      threeKings: {month:0,day:6,name:'Heilige Drei Könige',shortName:'Heilige Drei Könige',rule:'Fester Feiertag am 6. Januar (Erscheinungsfest).'},
+      womensDay: {month:2,day:8,name:'Internationaler Frauentag',shortName:'Frauentag',rule:'Fester Feiertag am 8. März.'},
+      labourDay: {month:4,day:1,name:'Tag der Arbeit',shortName:'Tag der Arbeit',rule:'Fester Feiertag am 1. Mai.'},
+      augsburgPeace: {month:7,day:8,name:'Augsburger Friedensfest',shortName:'Friedensfest',rule:'Fester Feiertag am 8. August.'},
+      assumption: {month:7,day:15,name:'Mariä Himmelfahrt',shortName:'Mariä Himmelfahrt',rule:'Fester Feiertag am 15. August.'},
+      worldChildrensDay: {month:8,day:20,name:'Weltkindertag',shortName:'Weltkindertag',rule:'Fester Feiertag am 20. September.'},
+      unityDay: {month:9,day:3,name:'Tag der Deutschen Einheit',shortName:'Deutsche Einheit',rule:'Fester Feiertag am 3. Oktober.'},
+      reformation: {month:9,day:31,name:'Reformationstag',shortName:'Reformationstag',rule:'Fester Feiertag am 31. Oktober.'},
+      allSaints: {month:10,day:1,name:'Allerheiligen',shortName:'Allerheiligen',rule:'Fester Feiertag am 1. November.'},
+      christmas1: {month:11,day:25,name:'1. Weihnachtstag',shortName:'1. Weihnachtstag',rule:'Fester Feiertag am 25. Dezember.'},
+      christmas2: {month:11,day:26,name:'2. Weihnachtstag',shortName:'2. Weihnachtstag',rule:'Fester Feiertag am 26. Dezember.'}
+    });
 
-      const easter = getEasterSunday(year);
-      const movable = [
-        {offset:-2,name:'Karfreitag',shortName:'Karfreitag',scope:'Bundesweit',rule:'Zwei Tage vor Ostersonntag (gregorianischer Kalender).'},
-        {offset:1,name:'Ostermontag',shortName:'Ostermontag',scope:'Bundesweit',rule:'Ein Tag nach Ostersonntag (gregorianischer Kalender).'},
-        {offset:39,name:'Christi Himmelfahrt',shortName:'Christi Himmelfahrt',scope:'Bundesweit',rule:'39 Tage nach Ostersonntag.'},
-        {offset:50,name:'Pfingstmontag',shortName:'Pfingstmontag',scope:'Bundesweit',rule:'50 Tage nach Ostersonntag.'},
-        {offset:60,name:'Fronleichnam',shortName:'Fronleichnam',scope:'NRW',rule:'60 Tage nach Ostersonntag; Donnerstag nach dem Sonntag Trinitatis.'}
-      ].map(item => {
-        const date = addDays(easter,item.offset);
-        return {...item,date,key:dateKey(date),symbol:'✦'};
+    const MOVABLE_HOLIDAY_DEFS = Object.freeze({
+      goodFriday: {offset:-2,name:'Karfreitag',shortName:'Karfreitag',rule:'Zwei Tage vor Ostersonntag nach dem gregorianischen Kalender.'},
+      easterSunday: {offset:0,name:'Ostersonntag',shortName:'Ostersonntag',rule:'Ostersonntag nach dem gregorianischen Kalender.'},
+      easterMonday: {offset:1,name:'Ostermontag',shortName:'Ostermontag',rule:'Ein Tag nach Ostersonntag.'},
+      ascension: {offset:39,name:'Christi Himmelfahrt',shortName:'Himmelfahrt',rule:'39 Tage nach Ostersonntag.'},
+      pentecostSunday: {offset:49,name:'Pfingstsonntag',shortName:'Pfingstsonntag',rule:'49 Tage nach Ostersonntag.'},
+      pentecostMonday: {offset:50,name:'Pfingstmontag',shortName:'Pfingstmontag',rule:'50 Tage nach Ostersonntag.'},
+      corpusChristi: {offset:60,name:'Fronleichnam',shortName:'Fronleichnam',rule:'60 Tage nach Ostersonntag; Donnerstag nach dem Sonntag Trinitatis.'}
+    });
+
+    // Landesrechtliche Feiertagslisten. Regionale Feiertage werden getrennt
+    // markiert, weil sie nicht im gesamten Bundesland gelten.
+    const STATE_HOLIDAY_RULES = Object.freeze({
+      BW: {fixed:['threeKings','allSaints'],movable:['corpusChristi']},
+      BY: {fixed:['threeKings','allSaints'],movable:['corpusChristi'],regionalFixed:['assumption','augsburgPeace']},
+      BE: {fixed:['womensDay']},
+      BB: {fixed:['reformation'],movable:['easterSunday','pentecostSunday']},
+      HB: {fixed:['reformation']},
+      HH: {fixed:['reformation']},
+      HE: {movable:['corpusChristi']},
+      MV: {fixed:['womensDay','reformation']},
+      NI: {fixed:['reformation']},
+      NW: {fixed:['allSaints'],movable:['corpusChristi']},
+      RP: {fixed:['allSaints'],movable:['corpusChristi']},
+      SL: {fixed:['assumption','allSaints'],movable:['corpusChristi']},
+      SN: {fixed:['reformation'],movable:['bußUndBettag'],regionalMovable:['corpusChristi']},
+      ST: {fixed:['threeKings','reformation']},
+      SH: {fixed:['reformation']},
+      TH: {fixed:['reformation','worldChildrensDay'],regionalMovable:['corpusChristi']}
+    });
+
+    function getSelectedState(stateCode=settings.federalState) {
+      return FEDERAL_STATES.find(state=>state.code===stateCode) || FEDERAL_STATES.find(state=>state.code==='NW');
+    }
+    function createHoliday(definition,date,state,scopeType,regionalNote='') {
+      let scope='Bundesweit';
+      let scopeLabel='DE';
+      let scopeDescription='Gesetzlicher Feiertag in allen 16 Bundesländern.';
+      if (scopeType==='state') {
+        scope=state.name;
+        scopeLabel=state.code;
+        scopeDescription=`Zusätzlicher gesetzlicher Feiertag im Bundesland ${state.name}.`;
+      } else if (scopeType==='regional') {
+        scope='Regional';
+        scopeLabel='Regional';
+        scopeDescription=`Regionaler gesetzlicher Feiertag in ${state.name}. ${regionalNote}`;
+      }
+      return {
+        ...definition,
+        date,
+        key:dateKey(date),
+        symbol:'✦',
+        scope,
+        scopeType,
+        scopeLabel,
+        scopeDescription,
+        regional:scopeType==='regional'
+      };
+    }
+
+    function getBußUndBettag(year) {
+      // Buß- und Bettag: Mittwoch vor dem 23. November (nur Sachsen).
+      const reference=makeLocalDate(year,10,23);
+      const difference=(reference.getDay()-3+7)%7 || 7;
+      return addDays(reference,-difference);
+    }
+
+    function getHolidays(year,stateCode=settings.federalState) {
+      const state=getSelectedState(stateCode);
+      const cacheKey=`${state.code}:${year}`;
+      if (holidayCache.has(cacheKey)) return holidayCache.get(cacheKey).map(item=>({...item,date:new Date(item.date)}));
+      const rules=STATE_HOLIDAY_RULES[state.code] || {};
+      const result=[];
+      const addFixed=(id,scopeType='state',regionalNote='')=>{
+        const definition=FIXED_HOLIDAY_DEFS[id];
+        if (!definition) return;
+        const date=makeLocalDate(year,definition.month,definition.day);
+        result.push(createHoliday(definition,date,state,scopeType,regionalNote));
+      };
+      const addMovable=(id,scopeType='state',regionalNote='')=>{
+        if (id==='bußUndBettag') {
+          const definition={name:'Buß- und Bettag',shortName:'Buß- und Bettag',rule:'Mittwoch vor dem 23. November; gesetzlicher Feiertag nur in Sachsen.'};
+          result.push(createHoliday(definition,getBußUndBettag(year),state,scopeType,regionalNote));
+          return;
+        }
+        const definition=MOVABLE_HOLIDAY_DEFS[id];
+        if (!definition) return;
+        result.push(createHoliday(definition,addDays(easter,definition.offset),state,scopeType,regionalNote));
+      };
+
+      // Neun gesetzliche Feiertage, die in allen Bundesländern gelten.
+      ['newYear','labourDay','unityDay','christmas1','christmas2'].forEach(id=>addFixed(id,'federal'));
+      const easter=getEasterSunday(year);
+      ['goodFriday','easterMonday','ascension','pentecostMonday'].forEach(id=>addMovable(id,'federal'));
+
+      (rules.fixed||[]).forEach(id=>addFixed(id,'state'));
+      (rules.movable||[]).forEach(id=>addMovable(id,'state'));
+
+      (rules.regionalFixed||[]).forEach(id=>{
+        let note='';
+        if (id==='assumption') note='Gilt nur in bayerischen Gemeinden mit überwiegend katholischer Bevölkerung.';
+        if (id==='augsburgPeace') note='Gilt ausschließlich im Stadtgebiet der Stadt Augsburg.';
+        addFixed(id,'regional',note);
+      });
+      (rules.regionalMovable||[]).forEach(id=>{
+        let note='';
+        if (state.code==='SN') note='Gilt nur in den gesetzlich festgelegten katholisch geprägten Gemeinden des sorbischen Siedlungsgebietes im Landkreis Bautzen.';
+        if (state.code==='TH') note='Gilt nur im Landkreis Eichsfeld sowie in bestimmten Gemeinden und Ortsteilen der Landkreise Unstrut-Hainich und Wartburg.';
+        addMovable(id,'regional',note);
       });
 
-      const result = [...fixed,...movable].sort((a,b)=>a.date-b.date);
-      holidayCache.set(year,result);
-      return result.map(item => ({...item}));
+      const sorted=result.sort((a,b)=>a.date-b.date);
+      holidayCache.set(cacheKey,sorted);
+      return sorted.map(item=>({...item,date:new Date(item.date)}));
+    }
+
+    function getHolidayCounts(holidays) {
+      const regional=holidays.filter(item=>item.scopeType==='regional').length;
+      const federal=holidays.filter(item=>item.scopeType==='federal').length;
+      const stateSpecific=holidays.filter(item=>item.scopeType==='state').length;
+      return {statewide:federal+stateSpecific,federal,stateSpecific,regional};
+    }
+    function getHolidayScopeClass(item) {
+      return item.scopeType==='regional'?'regional':item.scopeType==='state'?'state':'';
     }
 
     // ISO 8601: Die Kalenderwoche wird über den Donnerstag der jeweiligen
@@ -609,7 +751,8 @@
     }
     function getUpcomingHoliday() {
       const candidates = [...getHolidays(today.getFullYear()),...getHolidays(today.getFullYear()+1)];
-      return candidates.filter(item=>item.date>=today).sort((a,b)=>a.date-b.date)[0] || null;
+      // Regionale Feiertage nur als Hinweis anzeigen, nicht pauschal als nächsten freien Tag werten.
+      return candidates.filter(item=>!item.regional && item.date>=today).sort((a,b)=>a.date-b.date)[0] || null;
     }
     function loadSettings() {
       try {
@@ -624,6 +767,7 @@
       const validColor = (color,fallback) => /^#[0-9a-fA-F]{6}$/.test(color) ? color : fallback;
       return {
         defaultView: ['month','year','holidays'].includes(value.defaultView) ? value.defaultView : DEFAULT_SETTINGS.defaultView,
+        federalState: FEDERAL_STATES.some(state=>state.code===value.federalState) ? value.federalState : DEFAULT_SETTINGS.federalState,
         firstDay: Number(value.firstDay)===0 ? 0 : 1,
         showWeeks: Boolean(value.showWeeks),
         holidayColor: validColor(value.holidayColor,DEFAULT_SETTINGS.holidayColor),
@@ -646,6 +790,7 @@
       document.documentElement.style.setProperty('--holiday-font',`${settings.holidayFontSize}px`);
     }
     function syncSettingsForm() {
+      $('federalState').value = settings.federalState;
       $('defaultView').value = settings.defaultView;
       $('firstDay').value = String(settings.firstDay);
       $('showWeeks').checked = settings.showWeeks;
@@ -653,6 +798,30 @@
       $('holidayTextColor').value = settings.holidayTextColor;
       $('holidayFontSize').value = settings.holidayFontSize;
       $('holidayFontValue').textContent = `${settings.holidayFontSize.toLocaleString('de-DE')} px`;
+    }
+
+    function updateStateDisplay() {
+      const state=getSelectedState();
+      const counts=getHolidayCounts(getHolidays(today.getFullYear()));
+      $('setupStateSubtitle').textContent=`Darstellung anpassen · Bundesland: ${state.name}`;
+      $('stateNameLine').textContent=`${state.name} · Deutschland`;
+      $('heroSection').setAttribute('aria-label',`Kalender für ${state.name}`);
+      $('heroHolidaySummary').textContent=`${counts.statewide} landesweite Feiertage${counts.regional?` · ${counts.regional} regionale Sonderregelung${counts.regional===1?'':'en'}`:''} · vollständig offline`;
+      $('stateHolidayTitle').textContent=`Feiertage in ${state.name}`;
+      $('stateHolidayCount').textContent=String(counts.statewide);
+      $('federalHolidayCount').textContent=String(counts.federal);
+      $('stateSpecificHolidayCount').textContent=String(counts.stateSpecific);
+      $('regionalHolidayRow').hidden=counts.regional===0;
+      $('regionalHolidayCount').textContent=String(counts.regional);
+      const regionalNotes={
+        BY:'Mariä Himmelfahrt gilt nur in Gemeinden mit überwiegend katholischer Bevölkerung; das Augsburger Friedensfest gilt nur im Stadtgebiet Augsburg.',
+        SN:'Fronleichnam ist nur in bestimmten katholisch geprägten Gemeinden des sorbischen Siedlungsgebietes gesetzlicher Feiertag.',
+        TH:'Fronleichnam gilt nur im Landkreis Eichsfeld sowie in bestimmten Gemeinden und Ortsteilen der Landkreise Unstrut-Hainich und Wartburg.'
+      };
+      $('stateHolidayDescription').textContent=regionalNotes[state.code] || 'Die Feiertage werden jährlich lokal berechnet. Bewegliche Feiertage leiten sich vom gregorianischen Osterdatum ab.';
+      $('footerStateName').textContent=`Kalender · ${state.name}`;
+      $('dialogEyebrow').textContent=`Gesetzlicher Feiertag · ${state.name}`;
+      $('dialogSourceText').textContent=`Rechtsgrundlage: Feiertagsrecht des Landes ${state.name}. Regionale Feiertage gelten nur an den jeweils genannten Orten.`;
     }
 
     function updateHeroDate() {
@@ -741,8 +910,8 @@
           if (holiday) cell.type = 'button';
           cell.className = `day-cell${isWeekend?' weekend':''}${!inMonth?' outside-month':''}${isToday?' today':''}${holiday?' holiday':''}`;
           if (holiday) {
-            cell.title = `${formatLongDate(date)} · ${holiday.name} · ${holiday.scope==='NRW'?'NRW':'bundesweit'}`;
-            cell.setAttribute('aria-label',`${formatLongDate(date)}: ${holiday.name}, gesetzlicher Feiertag ${holiday.scope==='NRW'?'in Nordrhein-Westfalen':'bundesweit'}. Details anzeigen.`);
+            cell.title = `${formatLongDate(date)} · ${holiday.name} · ${holiday.scopeDescription}`;
+            cell.setAttribute('aria-label',`${formatLongDate(date)}: ${holiday.name}. ${holiday.scopeDescription} Details anzeigen.`);
             cell.addEventListener('click',()=>showHolidayDetails(holiday));
           } else {
             cell.setAttribute('aria-label',formatLongDate(date));
@@ -756,10 +925,11 @@
             label.className = 'holiday-label';
             label.innerHTML = `<span class="holiday-symbol" aria-hidden="true">✦</span><span class="holiday-label-text">${escapeHTML(holiday.name)}</span>`;
             cell.appendChild(label);
-            if (holiday.scope==='NRW') {
+            if (holiday.scopeType!=='federal') {
               const scope = document.createElement('span');
-              scope.className='scope-mini';
-              scope.textContent='NRW';
+              scope.className=`scope-mini${holiday.scopeType==='regional'?' regional':''}`;
+              scope.textContent=holiday.scopeLabel;
+              scope.title=holiday.scopeDescription;
               cell.appendChild(scope);
             }
           }
@@ -770,11 +940,12 @@
 
     function renderYear() {
       const year = selectedDate.getFullYear();
+      const holidays = getHolidays(year);
       $('viewTitle').textContent = `Jahresübersicht ${year}`;
-      $('viewSubtitle').textContent = 'Alle zwölf Monate · gesetzliche Feiertage direkt markiert';
+      const counts=getHolidayCounts(holidays);
+      $('viewSubtitle').textContent = `${counts.statewide} landesweite Feiertage${counts.regional?` · ${counts.regional} regionale Sonderfälle`:''} · alle zwölf Monate`;
       const grid = $('yearGrid');
       grid.innerHTML = '';
-      const holidays = getHolidays(year);
       const holidayMap = new Map(holidays.map(item=>[item.key,item]));
       for (let month=0;month<12;month++) {
         const monthHolidays = holidays.filter(item=>item.date.getMonth()===month);
@@ -819,7 +990,7 @@
           const list=document.createElement('ul'); list.className='month-holidays';
           monthHolidays.forEach(item=>{
             const li=document.createElement('li');
-            li.innerHTML=`<strong>${String(item.date.getDate()).padStart(2,'0')}.</strong>${escapeHTML(item.shortName)}${item.scope==='NRW'?' · NRW':''}`;
+            li.innerHTML=`<strong>${String(item.date.getDate()).padStart(2,'0')}.</strong>${escapeHTML(item.shortName)}${item.scopeType==='state'?` · ${item.scopeLabel}`:item.scopeType==='regional'?' · regional':''}`;
             list.appendChild(li);
           });
           card.appendChild(list);
@@ -832,7 +1003,8 @@
       const year=selectedDate.getFullYear();
       const holidays=getHolidays(year);
       $('viewTitle').textContent=`Feiertage ${year}`;
-      $('viewSubtitle').textContent=`Alle ${holidays.length} gesetzlichen Feiertage in chronologischer Reihenfolge`;
+      const counts=getHolidayCounts(holidays);
+      $('viewSubtitle').textContent=`${counts.statewide} landesweite Feiertage${counts.regional?` · ${counts.regional} regionale Sonderfälle`:''} in chronologischer Reihenfolge`;
       const list=$('holidayList'); list.innerHTML='';
       holidays.forEach(item=>{
         const row=document.createElement('article'); row.className='holiday-row';
@@ -842,7 +1014,7 @@
         const title=document.createElement('div'); title.className='holiday-row-title'; title.textContent=item.name;
         const sub=document.createElement('div'); sub.className='holiday-row-sub'; sub.textContent=`${formatDate(item.date,{weekday:'long'})} · ${year}`;
         main.append(title,sub);
-        const scope=document.createElement('span'); scope.className=`scope-pill${item.scope==='NRW'?' nrw':''}`; scope.textContent=item.scope;
+        const scope=document.createElement('span'); scope.className=`scope-pill ${getHolidayScopeClass(item)}`.trim(); scope.textContent=item.scopeLabel; scope.title=item.scopeDescription;
         const details=document.createElement('button'); details.className='holiday-row-action'; details.type='button'; details.textContent='Details';
         details.addEventListener('click',()=>showHolidayDetails(item));
         row.append(datebox,main,scope,details);
@@ -854,8 +1026,8 @@
     function showHolidayDetails(holiday) {
       $('dialogTitle').textContent=holiday.name;
       $('dialogDate').textContent=formatLongDate(holiday.date);
-      $('dialogDescription').textContent=holiday.rule;
-      $('dialogMeta').innerHTML=`<span class="scope-pill${holiday.scope==='NRW'?' nrw':''}">${holiday.scope}</span><span class="scope-pill">Gesetzlicher Feiertag</span>`;
+      $('dialogDescription').textContent=`${holiday.rule} ${holiday.scopeDescription}`;
+      $('dialogMeta').innerHTML=`<span class="scope-pill ${getHolidayScopeClass(holiday)}">${holiday.scopeLabel}</span><span class="scope-pill">Gesetzlicher Feiertag</span>`;
       const dialog=$('holidayDialog');
       if (typeof dialog.showModal==='function') dialog.showModal();
       else dialog.setAttribute('open','');
@@ -882,6 +1054,7 @@
       else if (currentView==='year') renderYear();
       else renderHolidayList();
       updateTodayButton();
+      updateStateDisplay();
       updateNextHoliday();
     }
     function shiftMonth(amount) {
@@ -906,6 +1079,7 @@
     }
     function applySettingsFromForm() {
       const next={
+        federalState:$('federalState').value,
         defaultView:$('defaultView').value,
         firstDay:Number($('firstDay').value),
         showWeeks:$('showWeeks').checked,
@@ -915,28 +1089,36 @@
       };
       const stored=saveSettings(next);
       applySettings();
+      holidayCache.clear();
       renderCurrentView();
       $('setupFeedback').textContent=stored?'Einstellungen lokal gespeichert.':'localStorage ist nicht verfügbar. Die Einstellungen gelten bis zum Schließen dieser Seite.';
     }
     function resetSettings() {
       const stored=saveSettings({...DEFAULT_SETTINGS});
+      holidayCache.clear();
       applySettings(); syncSettingsForm(); renderCurrentView();
       $('setupFeedback').textContent=stored?'Standardwerte wiederhergestellt und gespeichert.':'Standardwerte für diese Sitzung wiederhergestellt.';
     }
 
     // Öffentliche, reine Berechnungsfunktionen erleichtern die Offline-Prüfung.
     // Sie verändern weder Einstellungen noch Kalenderzustand.
-    window.KalenderNRW = Object.freeze({
+    const calendarApi = Object.freeze({
+      states: FEDERAL_STATES.map(state=>({...state})),
       getEasterSunday: year => new Date(getEasterSunday(year)),
-      getHolidays: year => getHolidays(year).map(item=>({name:item.name,date:new Date(item.date),scope:item.scope,key:item.key})),
+      getHolidays: (year,stateCode=settings.federalState) => getHolidays(year,stateCode).map(item=>({name:item.name,shortName:item.shortName,date:new Date(item.date),scope:item.scope,scopeType:item.scopeType,scopeLabel:item.scopeLabel,regional:item.regional,key:item.key})),
+      getHolidayCounts: (year,stateCode=settings.federalState) => getHolidayCounts(getHolidays(year,stateCode)),
       getISOWeek: date => getISOWeek(makeLocalDate(date.getFullYear(),date.getMonth(),date.getDate())),
       getDateKey: date => dateKey(date)
     });
+    window.KalenderFeiertage = calendarApi;
+    // Kompatibilitätsalias für ältere Tests aus der ursprünglichen NRW-Version.
+    window.KalenderNRW = calendarApi;
 
     $('todayBtn').addEventListener('click',goToday);
     $('settingsToggleBtn').addEventListener('click',()=>toggleSettings());
     $('closeSettingsBtn').addEventListener('click',()=>toggleSettings(false));
     $('saveSettingsBtn').addEventListener('click',applySettingsFromForm);
+    $('federalState').addEventListener('change',()=>{$('setupFeedback').textContent='Bundesland ausgewählt. Mit „Übernehmen“ speichern.';});
     $('resetSettingsBtn').addEventListener('click',resetSettings);
     $('holidayFontSize').addEventListener('input',()=>{$('holidayFontValue').textContent=`${Number($('holidayFontSize').value).toLocaleString('de-DE')} px`;});
     $('prevMonthBtn').addEventListener('click',()=>shiftMonth(-1));
